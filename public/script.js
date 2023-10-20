@@ -38,9 +38,9 @@ socket.on('user-disconnected', userId => {
 
 // webRTC connection
 peer.on('open', id => {
-    // socket.emit('join-room', ROOM_ID, id)
-    const roomId = location.pathname.substr(1)
-    socket.emit('join-room', roomId, id)
+    socket.emit('join-room', ROOM_ID, id)
+    // const roomId = location.pathname.substr(1)
+    // socket.emit('join-room', roomId, id)
 })
 
 function addVideoStream(video, stream) {
