@@ -4,7 +4,6 @@ const videoGrid = document.querySelector('#video-grid')
 const myVideo = document.createElement('video')
 myVideo.muted = true
 
-
 const peers = {}
 
 navigator.mediaDevices.getUserMedia({
@@ -30,6 +29,7 @@ navigator.mediaDevices.getUserMedia({
 
 socket.on('user-disconnected', userId => {
     console.log(userId, 'disconnected')
+    console.log(peers)
     // if(peers[userId]) {
         peers[userId].close()
     // }
@@ -38,7 +38,9 @@ socket.on('user-disconnected', userId => {
 
 // webRTC connection
 peer.on('open', id => {
-    socket.emit('join-room', ROOM_ID, id)
+    // socket.emit('join-room', ROOM_ID, id)
+    const roomId = location.pathname.substr(1)
+    socket.emit('join-room', roomId, id)
 })
 
 function addVideoStream(video, stream) {
