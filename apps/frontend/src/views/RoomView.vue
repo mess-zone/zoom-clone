@@ -36,6 +36,8 @@
     >
         {{ microfone.label }}
     </div>
+
+    <div ref="videoGrid" id="videoGrid"></div>
 </template>
 <script setup lang="ts">
 import { computed, ref, watchEffect } from "vue";
@@ -43,6 +45,8 @@ import { state, socket } from "../config/socket";
 import { useRoute } from "vue-router";
 
 import { useDevicesList, useUserMedia } from "@vueuse/core";
+
+import { Peer } from "peerjs";
 
 const route = useRoute();
 
@@ -57,6 +61,7 @@ function disconnect() {
     socket.disconnect();
 }
 
+// deprecated
 function joinRoom() {
     const roomId = route.params.roomId;
     // TODO
@@ -91,7 +96,15 @@ const { stream, enabled } = useUserMedia({
     },
 });
 
+enabled.value = true
+
+//p2p
+const peer = new Peer();
+
+const peers = {}
+
 watchEffect(() => {
+    console.log('WATCH EFFECT', stream.value)
     if (video.value) {
         video.value.srcObject = stream.value!;
         // video.value.addEventListener('loadedmetadata', () => {
@@ -99,6 +112,68 @@ watchEffect(() => {
         // })
     }
 });
+
+peer.on('call', call => {
+        call.answer(stream.value)
+
+        const video = document.createElement('video')
+        call.on('stream', userVideoStream => {
+            addVideoStream(video, userVideoStream)
+        })
+})
+
+socket.on('user-connected', userId => {
+        console.log('USER-connected', userId, stream.value)
+        connectToNewUser(userId, stream.value)
+})
+
+socket.on('user-disconnected', userId => {
+    console.log(userId, 'disconnected')
+    console.log(peers)
+    // if(peers[userId]) {
+        peers[userId].close()
+    // }
+})
+
+
+
+
+
+peer.on('open', id => {
+    console.log('peer connection opened', id)
+    socket.emit('join-room', route.params.roomId, id)
+})
+
+
+
+function connectToNewUser(userId, stream) {
+    console.log('connecting to new user', userId, stream)
+    const call = peer.call(userId, stream)
+    const video = document.createElement('video')
+    call.on('stream', userVideoStream => {
+        addVideoStream(video, userVideoStream)
+    })
+    call.on('close', () => {
+        video.remove()
+    })
+
+    peers[userId] = call
+}
+
+const videoGrid = ref<HTMLDivElement>();
+
+
+function addVideoStream(video, stream) {
+    console.log('ADD VIDEO STREAM', video)
+    video.srcObject = stream
+    video.addEventListener('loadedmetadata', () => {
+        video.play()
+    })
+
+    if(videoGrid.value) {
+        videoGrid.value.append(video)
+    }
+} 
 
 </script>
 
@@ -144,5 +219,10 @@ watchEffect(() => {
     display: inline-flex;
     justify-content: center;
     align-items: center;
+}
+
+#videoGrid {
+    display: flex;
+    flex-direction: column;
 }
 </style>
