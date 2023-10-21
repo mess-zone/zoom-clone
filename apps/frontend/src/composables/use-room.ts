@@ -1,8 +1,9 @@
-import { ref } from "vue"
+import { MaybeRefOrGetter, toRef } from "vue"
 
-export function useRoom(roomId: string) {
+export function useRoom(id: MaybeRefOrGetter<string>) {
 
-    const rId = ref(roomId)
+    // TODO rename to roomId
+    const rId = toRef(id)
 
     return {
         rId
