@@ -1,5 +1,18 @@
 <template>
     <div class="page">
+
+        <div class="video-wrapper">
+            <video ref="video" autoplay muted></video>
+            <div class="no-camera">
+                <div
+                    class="sound-level"
+                    :style="{ borderWidth: soundLevel + 'px' }"
+                ></div>
+            </div>
+        </div>
+
+        <div ref="videoGrid" id="videoGrid"></div>
+
         <h1>room</h1>
         <router-link to="/">Go to Home</router-link>
         <p>socket connected: {{ connected }}</p>
@@ -11,54 +24,13 @@
             {{ users }}
         </pre>
 
-        <div class="video-wrapper">
-            <video ref="video" autoplay muted></video>
-            <div class="no-camera">
-                <div
-                    class="sound-level"
-                    :style="{ borderWidth: soundLevel + 'px' }"
-                ></div>
-            </div>
-            <div class="bottom-bar">
-                <button
-                    class="btn-round"
-                    @click="muteCam"
-                    :title="!camIsEnabled ? 'Start cam' : 'Stop cam'"
-                >
-                    <font-awesome-icon
-                        v-show="camIsEnabled"
-                        icon="fa-solid fa-video"
-                    />
-                    <font-awesome-icon
-                        v-show="!camIsEnabled"
-                        icon="fa-solid fa-video-slash"
-                    />
-                </button>
-                <button
-                    class="btn-round"
-                    @click="muteMic"
-                    :title="!micIsEnabled ? 'Start cam' : 'Stop cam'"
-                >
-                    <font-awesome-icon
-                        v-show="micIsEnabled"
-                        icon="fa-solid fa-microphone"
-                    />
-                    <font-awesome-icon
-                        v-show="!micIsEnabled"
-                        icon="fa-solid fa-microphone-slash"
-                    />
-                </button>
-            </div>
-        </div>
-
-        <div ref="videoGrid" id="videoGrid"></div>
-
         <div class="footer-bar">
             <div class="center">
                 <button
                     class="btn-round"
+                    :class="{ 'btn-danger': !micIsEnabled }"
                     @click="muteMic"
-                    :title="!micIsEnabled ? 'Start mic' : 'Stop mic'"
+                    :title="!micIsEnabled ? 'Turn on microphone' : 'Turn off microphone'"
                 >
                     <font-awesome-icon
                         v-show="micIsEnabled"
@@ -71,8 +43,9 @@
                 </button>
                 <button
                     class="btn-round"
+                    :class="{ 'btn-danger': !camIsEnabled }"
                     @click="muteCam"
-                    :title="!camIsEnabled ? 'Start cam' : 'Stop cam'"
+                    :title="!camIsEnabled ? 'Turn on camera' : 'Turn off camera'"
                 >
                     <font-awesome-icon
                         v-show="camIsEnabled"
@@ -394,16 +367,6 @@ function closeSettingsModal() {
     object-fit: cover;
 }
 
-.video-wrapper .bottom-bar {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    margin-bottom: 10px;
-    gap: 8px;
-    display: flex;
-    justify-content: center;
-}
-
 .btn-round {
     width: 48px;
     height: 48px;
@@ -417,6 +380,10 @@ function closeSettingsModal() {
     display: inline-flex;
     justify-content: center;
     align-items: center;
+}
+
+.btn-round.btn-danger {
+    background-color: rgb(219, 39, 52);
 }
 
 .close-icon {
