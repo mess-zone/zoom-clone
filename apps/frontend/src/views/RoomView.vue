@@ -1,6 +1,7 @@
 <template>
-    <div class="page" >
-        <h1>room</h1> <router-link to="/">Go to Home</router-link>
+    <div class="page">
+        <h1>room</h1>
+        <router-link to="/">Go to Home</router-link>
         <p>socket connected: {{ connected }}</p>
         <!-- <button @click="joinRoom()">join-room</button>
         <br />
@@ -9,58 +10,133 @@
         <pre>
             {{ users }}
         </pre>
-    
+
         <div class="video-wrapper">
             <video ref="video" autoplay muted></video>
             <div class="no-camera">
-                <div class="sound-level" :style="{ borderWidth: soundLevel + 'px' }" ></div>
+                <div
+                    class="sound-level"
+                    :style="{ borderWidth: soundLevel + 'px' }"
+                ></div>
             </div>
             <div class="bottom-bar">
-                <button class="btn-round" @click="muteCam" :title="!camIsEnabled ? 'Start cam' : 'Stop cam'">
-                    <font-awesome-icon v-show="camIsEnabled" icon="fa-solid fa-video" />
-                    <font-awesome-icon v-show="!camIsEnabled" icon="fa-solid fa-video-slash" />
+                <button
+                    class="btn-round"
+                    @click="muteCam"
+                    :title="!camIsEnabled ? 'Start cam' : 'Stop cam'"
+                >
+                    <font-awesome-icon
+                        v-show="camIsEnabled"
+                        icon="fa-solid fa-video"
+                    />
+                    <font-awesome-icon
+                        v-show="!camIsEnabled"
+                        icon="fa-solid fa-video-slash"
+                    />
                 </button>
-                <button class="btn-round" @click="muteMic" :title="!micIsEnabled ? 'Start cam' : 'Stop cam'">
-                    <font-awesome-icon v-show="micIsEnabled" icon="fa-solid fa-microphone" />
-                    <font-awesome-icon v-show="!micIsEnabled" icon="fa-solid fa-microphone-slash" />
+                <button
+                    class="btn-round"
+                    @click="muteMic"
+                    :title="!micIsEnabled ? 'Start cam' : 'Stop cam'"
+                >
+                    <font-awesome-icon
+                        v-show="micIsEnabled"
+                        icon="fa-solid fa-microphone"
+                    />
+                    <font-awesome-icon
+                        v-show="!micIsEnabled"
+                        icon="fa-solid fa-microphone-slash"
+                    />
                 </button>
             </div>
         </div>
-        <h3>cameras</h3>
-        <button @click="muteCam">mute cam</button>
-        <div
-            v-for="camera of cameras"
-            :key="camera.deviceId"
-            :class="{ 'text-primary': currentCamera === camera.deviceId }"
-            @click="currentCamera = camera.deviceId"
-        >
-            {{ camera.label }}
-        </div>
-        <h3>microphones</h3>
-        <button @click="muteMic">mute mic</button>
-    
-        <div
-            v-for="microfone of microphones"
-            :key="microfone.deviceId"
-            :class="{ 'text-primary': currentMicrophone === microfone.deviceId }"
-            @click="currentMicrophone = microfone.deviceId"
-        >
-            {{ microfone.label }}
-        </div>
-    
+
         <div ref="videoGrid" id="videoGrid"></div>
-    
+
         <div class="footer-bar">
             <div class="center">
-                <button class="btn-round" @click="muteMic" :title="!micIsEnabled ? 'Start cam' : 'Stop cam'">
-                    <font-awesome-icon v-show="micIsEnabled" icon="fa-solid fa-microphone" />
-                    <font-awesome-icon v-show="!micIsEnabled" icon="fa-solid fa-microphone-slash" />
+                <button
+                    class="btn-round"
+                    @click="muteMic"
+                    :title="!micIsEnabled ? 'Start mic' : 'Stop mic'"
+                >
+                    <font-awesome-icon
+                        v-show="micIsEnabled"
+                        icon="fa-solid fa-microphone"
+                    />
+                    <font-awesome-icon
+                        v-show="!micIsEnabled"
+                        icon="fa-solid fa-microphone-slash"
+                    />
                 </button>
-                <button class="btn-round" @click="muteCam" :title="!camIsEnabled ? 'Start cam' : 'Stop cam'">
-                    <font-awesome-icon v-show="camIsEnabled" icon="fa-solid fa-video" />
-                    <font-awesome-icon v-show="!camIsEnabled" icon="fa-solid fa-video-slash" />
+                <button
+                    class="btn-round"
+                    @click="muteCam"
+                    :title="!camIsEnabled ? 'Start cam' : 'Stop cam'"
+                >
+                    <font-awesome-icon
+                        v-show="camIsEnabled"
+                        icon="fa-solid fa-video"
+                    />
+                    <font-awesome-icon
+                        v-show="!camIsEnabled"
+                        icon="fa-solid fa-video-slash"
+                    />
                 </button>
-                
+                <button class="btn-round" @click="" title="More options">
+                    <font-awesome-icon icon="fa-solid fa-ellipsis-vertical" />
+                </button>
+            </div>
+        </div>
+
+        <div class="modal-overlay">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>Settings</h2>
+                    <button class="close-icon">
+                        <font-awesome-icon icon="fa-solid fa-xmark" />
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="config-group">
+                        <h3>Video</h3>
+                        <h4>Camera</h4>
+                        <!-- <button @click="muteCam">mute cam</button> -->
+                        <ul class="select-list">
+                            <li
+                                v-for="camera of cameras"
+                                :key="camera.deviceId"
+                                class="option"
+                                :class="{
+                                    'active': currentCamera === camera.deviceId,
+                                }"
+                                @click="currentCamera = camera.deviceId"
+                            >
+                                {{ camera.label }}
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="config-group">
+                        <h3>Audio</h3>
+                        <h4>Microfone</h4>
+                        <!-- <button @click="muteMic">mute mic</button> -->
+    
+                        <ul class="select-list">
+                            <li
+                                v-for="microfone of microphones"
+                                :key="microfone.deviceId"
+                                class="option"
+                                :class="{
+                                    'active':
+                                        currentMicrophone === microfone.deviceId,
+                                }"
+                                @click="currentMicrophone = microfone.deviceId"
+                            >
+                                {{ microfone.label }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -73,7 +149,7 @@ import { useRoute } from "vue-router";
 import { useDevicesList, useUserMedia } from "@vueuse/core";
 
 import { Peer } from "peerjs";
-import throttle from 'lodash.throttle'
+import throttle from "lodash.throttle";
 
 const route = useRoute();
 
@@ -100,17 +176,18 @@ const users = computed(() => state.users);
 // camera e microfone
 const currentCamera = ref<string>();
 const currentMicrophone = ref<string>();
-const { 
-    videoInputs: cameras,
-    audioInputs: microphones,
-} = useDevicesList({
+const { videoInputs: cameras, audioInputs: microphones } = useDevicesList({
     requestPermissions: true,
     onUpdated() {
-        console.log('use devices list on updated')
+        console.log("use devices list on updated");
         if (!cameras.value.find((i) => i.deviceId === currentCamera.value)) {
             currentCamera.value = cameras.value[0]?.deviceId;
         }
-        if (!microphones.value.find((i) => i.deviceId === currentMicrophone.value)) {
+        if (
+            !microphones.value.find(
+                (i) => i.deviceId === currentMicrophone.value
+            )
+        ) {
             currentMicrophone.value = microphones.value[0]?.deviceId;
         }
     },
@@ -118,8 +195,8 @@ const {
 
 const video = ref<HTMLVideoElement>();
 const { stream, enabled, constraints, restart } = useUserMedia({
-    autoSwitch: true, 
-    constraints: { 
+    autoSwitch: true,
+    constraints: {
         // @ts-ignore
         video: { deviceId: currentCamera },
         // @ts-ignore
@@ -127,66 +204,64 @@ const { stream, enabled, constraints, restart } = useUserMedia({
     },
 });
 
-const soundLevel = ref(0)
-watch(stream, ()=> {
-    if(stream.value) {
-        console.log('STREAM CHANGED', stream)
-    
+const soundLevel = ref(0);
+watch(stream, () => {
+    if (stream.value) {
+        console.log("STREAM CHANGED", stream);
+
         // draw microphone activity levels
-        const audioContext = new AudioContext()
+        const audioContext = new AudioContext();
         const analyser = audioContext.createAnalyser();
         const microphone = audioContext.createMediaStreamSource(stream.value);
         const javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
-    
+
         analyser.smoothingTimeConstant = 0.3;
         analyser.fftSize = 1024;
-    
+
         microphone.connect(analyser);
         analyser.connect(javascriptNode);
         javascriptNode.connect(audioContext.destination);
-    
-        javascriptNode.onaudioprocess = throttle(()=> {
-                var array =  new Uint8Array(analyser.frequencyBinCount);
-                analyser.getByteFrequencyData(array);
-                var values = 0;
-        
-                var length = array.length;
-                for (var i = 0; i < length; i++) {
-                    values += array[i];
-                }
-        
-                var average = values / length;
-                // console.log(average)
-                soundLevel.value = average
-        }, 150)
+
+        javascriptNode.onaudioprocess = throttle(() => {
+            var array = new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteFrequencyData(array);
+            var values = 0;
+
+            var length = array.length;
+            for (var i = 0; i < length; i++) {
+                values += array[i];
+            }
+
+            var average = values / length;
+            // console.log(average)
+            soundLevel.value = average;
+        }, 150);
     }
-    
-})
+});
 
-watch(constraints, ()=> {
-    console.log('STREAM CONSTRAINS CHANGED', constraints)
-})
+watch(constraints, () => {
+    console.log("STREAM CONSTRAINS CHANGED", constraints);
+});
 
-watch(currentCamera, ()=> {
-    console.log('current camera CHANGED', currentCamera)
-    restart()
-})
+watch(currentCamera, () => {
+    console.log("current camera CHANGED", currentCamera);
+    restart();
+});
 
-watch(currentMicrophone, ()=> {
-    console.log('currentMicrophone CHANGED', currentMicrophone)
-    restart()
-})
+watch(currentMicrophone, () => {
+    console.log("currentMicrophone CHANGED", currentMicrophone);
+    restart();
+});
 
-
-enabled.value = true
+enabled.value = true;
 
 //p2p
 const peer = new Peer();
 
-const peers = {}
+const peers = {};
 
 watchEffect(() => {
-    console.log('WATCH EFFECT', stream.value)
+    console.log("WATCH EFFECT", stream.value);
     if (video.value) {
         video.value.srcObject = stream.value!;
         // video.value.addEventListener('loadedmetadata', () => {
@@ -195,106 +270,97 @@ watchEffect(() => {
     }
 });
 
-peer.on('call', call => {
-        call.answer(stream.value)
+peer.on("call", (call) => {
+    call.answer(stream.value);
 
-        const video = document.createElement('video')
-        call.on('stream', userVideoStream => {
-            addVideoStream(video, userVideoStream)
-        })
-})
+    const video = document.createElement("video");
+    call.on("stream", (userVideoStream) => {
+        addVideoStream(video, userVideoStream);
+    });
+});
 
-socket.on('user-connected', userId => {
-        console.log('USER-connected', userId, stream.value)
-        connectToNewUser(userId, stream.value)
-})
+socket.on("user-connected", (userId) => {
+    console.log("USER-connected", userId, stream.value);
+    connectToNewUser(userId, stream.value);
+});
 
-socket.on('user-disconnected', userId => {
-    console.log(userId, 'disconnected')
-    console.log(peers)
+socket.on("user-disconnected", (userId) => {
+    console.log(userId, "disconnected");
+    console.log(peers);
     // if(peers[userId]) {
-        peers[userId].close()
+    peers[userId].close();
     // }
-})
+});
 
-
-
-
-
-peer.on('open', id => {
-    console.log('peer connection opened', id)
-    socket.emit('join-room', route.params.roomId, id)
-})
-
-
+peer.on("open", (id) => {
+    console.log("peer connection opened", id);
+    socket.emit("join-room", route.params.roomId, id);
+});
 
 function connectToNewUser(userId, stream) {
-    console.log('connecting to new user', userId, stream)
-    const call = peer.call(userId, stream)
-    const video = document.createElement('video')
-    call.on('stream', userVideoStream => {
-        addVideoStream(video, userVideoStream)
-    })
-    call.on('close', () => {
-        video.remove()
-    })
+    console.log("connecting to new user", userId, stream);
+    const call = peer.call(userId, stream);
+    const video = document.createElement("video");
+    call.on("stream", (userVideoStream) => {
+        addVideoStream(video, userVideoStream);
+    });
+    call.on("close", () => {
+        video.remove();
+    });
 
-    peers[userId] = call
+    peers[userId] = call;
 }
 
 const videoGrid = ref<HTMLDivElement>();
 
-
 function addVideoStream(video, stream) {
-    console.log('ADD VIDEO STREAM', video)
-    video.srcObject = stream
-    video.addEventListener('loadedmetadata', () => {
-        video.play()
-    })
+    console.log("ADD VIDEO STREAM", video);
+    video.srcObject = stream;
+    video.addEventListener("loadedmetadata", () => {
+        video.play();
+    });
 
-    if(videoGrid.value) {
-        videoGrid.value.append(video)
+    if (videoGrid.value) {
+        videoGrid.value.append(video);
     }
-} 
+}
 
-const camIsEnabled = ref(false)
-const micIsEnabled = ref(false)
+const camIsEnabled = ref(false);
+const micIsEnabled = ref(false);
 
 watchEffect(() => {
     if (stream.value) {
-        camIsEnabled.value = stream.value.getVideoTracks()[0].enabled
-        micIsEnabled.value = stream.value.getAudioTracks()[0].enabled
-        console.log('BUTTONS watchers', camIsEnabled.value, micIsEnabled.value)
+        camIsEnabled.value = stream.value.getVideoTracks()[0].enabled;
+        micIsEnabled.value = stream.value.getAudioTracks()[0].enabled;
+        console.log("BUTTONS watchers", camIsEnabled.value, micIsEnabled.value);
     }
 });
 
 function muteCam() {
-    camIsEnabled.value = !camIsEnabled.value
+    camIsEnabled.value = !camIsEnabled.value;
     // @ts-ignore
-    stream.value.getVideoTracks().forEach(track => track.enabled = camIsEnabled.value);
-     // @ts-ignore
-    console.log('mute cam', stream.value.getVideoTracks()[0])
+    stream.value
+        .getVideoTracks()
+        .forEach((track) => (track.enabled = camIsEnabled.value));
+    // @ts-ignore
+    console.log("mute cam", stream.value.getVideoTracks()[0]);
 }
 
 function muteMic() {
-    micIsEnabled.value = !micIsEnabled.value
+    micIsEnabled.value = !micIsEnabled.value;
 
-     // @ts-ignore
-    stream.value.getAudioTracks().forEach(track => track.enabled = micIsEnabled.value);
-     // @ts-ignore
-    console.log('mute mic', stream.value.getAudioTracks()[0])
+    // @ts-ignore
+    stream.value
+        .getAudioTracks()
+        .forEach((track) => (track.enabled = micIsEnabled.value));
+    // @ts-ignore
+    console.log("mute mic", stream.value.getAudioTracks()[0]);
 }
-
 </script>
 
 <style scoped>
 .page {
     background-color: rgb(32, 29, 34);
-}
-
-.text-primary {
-    color: green;
-    font-weight: bold;
 }
 
 .video-wrapper {
@@ -333,6 +399,20 @@ function muteMic() {
     font-size: 1.2em;
     background-color: rgba(255, 255, 255, 0.2);
     color: #f9f9f9;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.close-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    padding: 0;
+    font-size: 1.5em;
+    color:rgba(0, 0, 0, 0.6);
     cursor: pointer;
     display: inline-flex;
     justify-content: center;
@@ -378,6 +458,53 @@ function muteMic() {
     justify-content: center;
     align-items: center;
     gap: 10px;
+}
 
+.modal-overlay {
+    background-color: rgba(0, 0, 0, 0.781);
+    position: fixed;
+    inset: 0;
+    display: grid;
+    /* justify-items: center;
+    align-items: center; */
+    place-items: center;
+}
+
+.modal {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.config-group {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 15px 0;
+}
+
+.select-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.select-list li {
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.select-list li:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.select-list li.active {
+    color: green;
+    font-weight: bold;
 }
 </style>
