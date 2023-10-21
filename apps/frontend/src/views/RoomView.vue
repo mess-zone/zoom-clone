@@ -83,17 +83,17 @@
                         icon="fa-solid fa-video-slash"
                     />
                 </button>
-                <button class="btn-round" @click="" title="More options">
+                <button class="btn-round" @click="openSettingsModal" title="More options">
                     <font-awesome-icon icon="fa-solid fa-ellipsis-vertical" />
                 </button>
             </div>
         </div>
 
-        <div class="modal-overlay">
-            <div class="modal">
+        <div v-if="settingModalIsOpen" class="modal-overlay" @click="closeSettingsModal">
+            <div class="modal" @click.stop="">
                 <div class="modal-header">
                     <h2>Settings</h2>
-                    <button class="close-icon">
+                    <button class="close-icon" @click="closeSettingsModal">
                         <font-awesome-icon icon="fa-solid fa-xmark" />
                     </button>
                 </div>
@@ -356,11 +356,25 @@ function muteMic() {
     // @ts-ignore
     console.log("mute mic", stream.value.getAudioTracks()[0]);
 }
+
+
+const settingModalIsOpen = ref(false)
+
+function openSettingsModal() {
+    settingModalIsOpen.value = true
+}
+
+function closeSettingsModal() {
+    settingModalIsOpen.value = false
+}
 </script>
 
 <style scoped>
 .page {
     background-color: rgb(32, 29, 34);
+    position: absolute;
+    width: 100%;
+    min-height: 100%;
 }
 
 .video-wrapper {
