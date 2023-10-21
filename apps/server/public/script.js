@@ -1,3 +1,7 @@
+/*
+Deprecated file
+*/
+
 const socket = io('/')
 const peer = new Peer();
 const videoGrid = document.querySelector('#video-grid')

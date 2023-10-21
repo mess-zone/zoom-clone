@@ -15,8 +15,8 @@ const io = require('socket.io')(server, {
 })
 
 // TODO deprecated
-app.set('view engine', 'ejs')
-app.use(express.static('public'))
+// app.set('view engine', 'ejs')
+// app.use(express.static('public'))
 
 // app.get('/', (req, res) => {
 //     res.redirect(`/${uuidV4()}`)
