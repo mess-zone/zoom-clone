@@ -12,9 +12,6 @@
         </div>
 
         <div ref="videoGrid" id="videoGrid"></div>
-
-        <h1>room</h1>
-        <router-link to="/">Go to Home</router-link>
         <p>socket connected: {{ connected }}</p>
         <!-- <button @click="joinRoom()">join-room</button>
         <br />
@@ -25,6 +22,7 @@
         </pre>
 
         <div class="footer-bar">
+            <h4>{{ roomId }}</h4>
             <div class="center">
                 <button
                     class="btn-round"
@@ -59,7 +57,11 @@
                 <button class="btn-round" @click="openSettingsModal" title="More options">
                     <font-awesome-icon icon="fa-solid fa-ellipsis-vertical" />
                 </button>
+                <button class="btn-round btn-danger" @click="handleLeaveRoom" title="End call">
+                    <font-awesome-icon icon="fa-solid fa-phone" rotation="180" />
+                </button>
             </div>
+            <h4>{{ roomId }}</h4>
         </div>
 
         <div v-if="settingModalIsOpen" class="modal-overlay" @click="closeSettingsModal">
@@ -123,6 +125,7 @@ import { useDevicesList, useUserMedia } from "@vueuse/core";
 
 import { Peer } from "peerjs";
 import throttle from "lodash.throttle";
+import router from "../routes";
 
 const route = useRoute();
 
@@ -133,9 +136,9 @@ const users = computed(() => state.users);
 //     socket.connect();
 // }
 
-// function disconnect() {
-//     socket.disconnect();
-// }
+function disconnect() {
+    socket.disconnect();
+}
 
 // // deprecated
 // function joinRoom() {
@@ -270,6 +273,8 @@ peer.on("open", (id) => {
     socket.emit("join-room", route.params.roomId, id);
 });
 
+const roomId = ref(route.params.roomId)
+
 function connectToNewUser(userId, stream) {
     console.log("connecting to new user", userId, stream);
     const call = peer.call(userId, stream);
@@ -339,6 +344,14 @@ function openSettingsModal() {
 
 function closeSettingsModal() {
     settingModalIsOpen.value = false
+}
+
+function handleLeaveRoom() {
+    console.log('leave room')
+    disconnect()
+    router.push({
+        name: 'home'
+    })
 }
 </script>
 
@@ -430,8 +443,11 @@ function closeSettingsModal() {
     bottom: 0;
     width: 100%;
     display: flex;
-    justify-content: center;
-    padding: 30px 0;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 20px;
+    color: white;
+    gap: 10px;
 }
 
 .footer-bar .center {
