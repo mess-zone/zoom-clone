@@ -3,10 +3,12 @@ import RoomViewVue from "../views/RoomView.vue"
 import { createRouter, createWebHistory } from 'vue-router'
 const routes = [
     {
+        name: 'home',
         path: '/',
         component: HomeViewVue,
     },
     {
+        name: 'room',
         path: '/:roomId',
         component: RoomViewVue,
     },

@@ -1,8 +1,11 @@
-console.log('server started')
+const cors = require('cors')
+
 const { v4: uuidV4 } = require('uuid')
 
 const express = require('express')
 const app = express()
+app.use(cors())
+
 const server = require('http').Server(app)
 
 const io = require('socket.io')(server)
@@ -12,6 +15,11 @@ app.use(express.static('public'))
 
 app.get('/', (req, res) => {
     res.redirect(`/${uuidV4()}`)
+})
+
+// generate room id
+app.get('/api/room', (req, res) => {
+    res.json({ roomId: uuidV4() })
 })
 
 
@@ -32,5 +40,7 @@ io.on('connection', socket => {
     })
 })
 
-server.listen(3000)
+server.listen(3000, () => {
+    console.log('server started on port', 3000)
+})
 

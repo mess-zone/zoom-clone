@@ -1,17 +1,39 @@
 <template>
     <div>
-        <a href="https://vitejs.dev" target="_blank">
-            <img src="/vite.svg" class="logo" alt="Vite logo" />
-        </a>
-        <a href="https://vuejs.org/" target="_blank">
-            <img src="../assets/vue.svg" class="logo vue" alt="Vue logo" />
-        </a>
+        <button @click="handleNewRoom">new room</button>
     </div>
-    <HelloWorld msg="Vite + Vue" />
 </template>
 
 <script setup lang="ts">
-import HelloWorld from "../components/HelloWorld.vue";
+import { useRouter } from 'vue-router';
+import { serverAPI } from '../config/axios'
+
+const router = useRouter()
+
+async function handleNewRoom() {
+    try {
+        const roomId = await createRoomId()
+        console.log('created roomId', roomId)
+        router.push({
+            name: 'room',
+            params: {
+                roomId,
+            }
+        })
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function createRoomId() {
+  try {
+    const response = await serverAPI.get('/room');
+    return response.data.roomId
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 </script>
 
 <style scoped>
