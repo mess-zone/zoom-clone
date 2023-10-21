@@ -24,12 +24,14 @@ socket.on("disconnect", () => {
 // TODO rename to user-joined-room
 socket.on('user-connected', (userId) => {
     console.log('user-connected', userId)
+    // @ts-ignore
     state.users[userId] = true
 })
 
 // TODO rename to user-leaved-room
 socket.on('user-disconnected', (userId) => {
     console.log('user-disconnected', userId)
+    // @ts-ignore
     state.users[userId] = false
 })
 

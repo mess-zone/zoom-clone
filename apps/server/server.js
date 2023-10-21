@@ -14,6 +14,7 @@ const io = require('socket.io')(server, {
     }
 })
 
+// TODO deprecated
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
 
