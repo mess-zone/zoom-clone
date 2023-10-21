@@ -416,17 +416,6 @@ function handleLeaveRoom() {
     align-items: center;
 }
 
-#videoGrid {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    padding: 30px;
-}
-
 
 .no-camera {
     position: absolute;
