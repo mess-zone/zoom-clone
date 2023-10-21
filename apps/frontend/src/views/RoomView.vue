@@ -121,6 +121,7 @@
 import { computed, ref, watch, watchEffect } from "vue";
 import { state, socket } from "../config/socket";
 import { useRoute } from "vue-router";
+import { useRoom } from '../composables/use-room'
 
 import { useDevicesList, useUserMedia } from "@vueuse/core";
 
@@ -140,15 +141,6 @@ const users = computed(() => state.users);
 function disconnect() {
     socket.disconnect();
 }
-
-// // deprecated
-// function joinRoom() {
-//     const roomId = route.params.roomId;
-//     // TODO
-//     const userId = "FAKE-USER-ID";
-//     console.log("emit ", roomId, userId);
-//     socket.emit("join-room", roomId, userId);
-// }
 
 // camera e microfone
 const currentCamera = ref<string>();
@@ -269,12 +261,14 @@ socket.on("user-disconnected", (userId) => {
     // }
 });
 
+
+const { rId: roomId } = useRoom(''+route.params.roomId)
+
 peer.on("open", (id) => {
     console.log("peer connection opened", id);
-    socket.emit("join-room", route.params.roomId, id);
+    socket.emit("join-room", roomId.value, id);
 });
 
-const roomId = ref(route.params.roomId)
 
 function connectToNewUser(userId, stream) {
     console.log("connecting to new user", userId, stream);
