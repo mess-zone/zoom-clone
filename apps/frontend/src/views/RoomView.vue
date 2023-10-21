@@ -66,7 +66,8 @@
         </div>
 
         <Teleport to="body">
-            <div v-if="settingsModalIsOpen" class="modal-overlay" @click="closeSettingsModal">
+            <ModalSettings :isOpen="settingsModalIsOpen" @close="closeSettingsModal" />
+            <!-- <div v-if="settingsModalIsOpen" class="modal-overlay" @click="closeSettingsModal">
                 <div class="modal" @click.stop="">
                     <div class="modal-header">
                         <h2>Settings</h2>
@@ -78,7 +79,6 @@
                         <div class="config-group">
                             <h3>Video</h3>
                             <h4>Camera</h4>
-                            <!-- <button @click="muteCam">mute cam</button> -->
                             <ul class="select-list">
                                 <li
                                     v-for="camera of cameras"
@@ -96,7 +96,6 @@
                         <div class="config-group">
                             <h3>Audio</h3>
                             <h4>Microfone</h4>
-                            <!-- <button @click="muteMic">mute mic</button> -->
         
                             <ul class="select-list">
                                 <li
@@ -115,7 +114,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </Teleport>
     </div>
 </template>
@@ -132,6 +131,7 @@ import { useUserMedia } from "@vueuse/core";
 import { Peer } from "peerjs";
 import throttle from "lodash.throttle";
 import router from "../routes";
+import ModalSettings from "../components/ModalSettings.vue";
 
 const route = useRoute();
 
@@ -491,4 +491,3 @@ function handleLeaveRoom() {
     font-weight: bold;
 }
 </style>
-../composables/use-devices
