@@ -1,4 +1,4 @@
-import { ref } from "vue"
+import { MaybeRefOrGetter, ref, toValue } from "vue"
 import { useDevicesList } from "@vueuse/core";
 
 export function useDevices() {
@@ -19,12 +19,22 @@ export function useDevices() {
         },
     });
 
+    function setCurrentCamera(device: MaybeRefOrGetter<MediaDeviceInfo>) {
+        currentCamera.value = toValue(device).deviceId
+    }
+
+    function setCurrentMicrophone(device: MaybeRefOrGetter<MediaDeviceInfo>) {
+        currentMicrophone.value = toValue(device).deviceId
+    }
+
 
     return {
         // TODO rename to currentCameraId
         currentCamera,
         // TODO renamte to currentMicrophoneId
         currentMicrophone,
+        setCurrentCamera,
+        setCurrentMicrophone,
         // TODO rename to availableCameras
         cameras,
         // TODO renamte to availableMicrophones

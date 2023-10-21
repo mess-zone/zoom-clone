@@ -86,7 +86,7 @@
                                 :class="{
                                     'active': currentCamera === camera.deviceId,
                                 }"
-                                @click="currentCamera = camera.deviceId"
+                                @click="setCurrentCamera(camera)"
                             >
                                 {{ camera.label }}
                             </li>
@@ -106,7 +106,7 @@
                                     'active':
                                         currentMicrophone === microfone.deviceId,
                                 }"
-                                @click="currentMicrophone = microfone.deviceId"
+                                @click="setCurrentMicrophone(microfone)"
                             >
                                 {{ microfone.label }}
                             </li>
@@ -146,7 +146,14 @@ function disconnect() {
 
 // const { localStream } = useStream()
 
-const { currentCamera, currentMicrophone, cameras, microphones } = useDevices()
+const { 
+    currentCamera, 
+    currentMicrophone, 
+    cameras, 
+    microphones, 
+    setCurrentCamera,
+    setCurrentMicrophone,
+} = useDevices()
 
 const video = ref<HTMLVideoElement>();
 const { stream, enabled, constraints, restart } = useUserMedia({
