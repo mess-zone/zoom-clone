@@ -202,12 +202,16 @@ function addVideoStream(video, stream) {
 } 
 
 function muteCam() {
+    // @ts-ignore
     stream.value.getVideoTracks().forEach(track => track.enabled = !track.enabled);
+     // @ts-ignore
     console.log('mute cam', stream.value.getVideoTracks())
 }
 
 function muteMic() {
+     // @ts-ignore
     stream.value.getAudioTracks().forEach(track => track.enabled = !track.enabled);
+     // @ts-ignore
     console.log('mute mic', stream.value.getVideoTracks())
 }
 
