@@ -1,53 +1,69 @@
 <template>
-    <h1>room</h1>
-    <p>socket connected: {{ connected }}</p>
-    <!-- <button @click="joinRoom()">join-room</button>
-    <br />
-    <button @click="connect()">Connect</button>
-    <button @click="disconnect()">Disconnect</button> -->
-    <pre>
-        {{ users }}
-    </pre>
-
-    <div class="video-wrapper">
-        <video ref="video" autoplay muted></video>
-        <div class="no-camera">
-            <div class="sound-level" :style="{ borderWidth: soundLevel + 'px' }" ></div>
+    <div class="page" >
+        <h1>room</h1> <router-link to="/">Go to Home</router-link>
+        <p>socket connected: {{ connected }}</p>
+        <!-- <button @click="joinRoom()">join-room</button>
+        <br />
+        <button @click="connect()">Connect</button>
+        <button @click="disconnect()">Disconnect</button> -->
+        <pre>
+            {{ users }}
+        </pre>
+    
+        <div class="video-wrapper">
+            <video ref="video" autoplay muted></video>
+            <div class="no-camera">
+                <div class="sound-level" :style="{ borderWidth: soundLevel + 'px' }" ></div>
+            </div>
+            <div class="bottom-bar">
+                <button class="btn-round" @click="muteCam" :title="!camIsEnabled ? 'Start cam' : 'Stop cam'">
+                    <font-awesome-icon v-show="camIsEnabled" icon="fa-solid fa-video" />
+                    <font-awesome-icon v-show="!camIsEnabled" icon="fa-solid fa-video-slash" />
+                </button>
+                <button class="btn-round" @click="muteMic" :title="!micIsEnabled ? 'Start cam' : 'Stop cam'">
+                    <font-awesome-icon v-show="micIsEnabled" icon="fa-solid fa-microphone" />
+                    <font-awesome-icon v-show="!micIsEnabled" icon="fa-solid fa-microphone-slash" />
+                </button>
+            </div>
         </div>
-        <div class="bottom-bar">
-            <button class="btn-round" @click="muteCam" :title="!camIsEnabled ? 'Start cam' : 'Stop cam'">
-                <font-awesome-icon v-show="camIsEnabled" icon="fa-solid fa-video" />
-                <font-awesome-icon v-show="!camIsEnabled" icon="fa-solid fa-video-slash" />
-            </button>
-            <button class="btn-round" @click="muteMic" :title="!micIsEnabled ? 'Start cam' : 'Stop cam'">
-                <font-awesome-icon v-show="micIsEnabled" icon="fa-solid fa-microphone" />
-                <font-awesome-icon v-show="!micIsEnabled" icon="fa-solid fa-microphone-slash" />
-            </button>
+        <h3>cameras</h3>
+        <button @click="muteCam">mute cam</button>
+        <div
+            v-for="camera of cameras"
+            :key="camera.deviceId"
+            :class="{ 'text-primary': currentCamera === camera.deviceId }"
+            @click="currentCamera = camera.deviceId"
+        >
+            {{ camera.label }}
+        </div>
+        <h3>microphones</h3>
+        <button @click="muteMic">mute mic</button>
+    
+        <div
+            v-for="microfone of microphones"
+            :key="microfone.deviceId"
+            :class="{ 'text-primary': currentMicrophone === microfone.deviceId }"
+            @click="currentMicrophone = microfone.deviceId"
+        >
+            {{ microfone.label }}
+        </div>
+    
+        <div ref="videoGrid" id="videoGrid"></div>
+    
+        <div class="footer-bar">
+            <div class="center">
+                <button class="btn-round" @click="muteMic" :title="!micIsEnabled ? 'Start cam' : 'Stop cam'">
+                    <font-awesome-icon v-show="micIsEnabled" icon="fa-solid fa-microphone" />
+                    <font-awesome-icon v-show="!micIsEnabled" icon="fa-solid fa-microphone-slash" />
+                </button>
+                <button class="btn-round" @click="muteCam" :title="!camIsEnabled ? 'Start cam' : 'Stop cam'">
+                    <font-awesome-icon v-show="camIsEnabled" icon="fa-solid fa-video" />
+                    <font-awesome-icon v-show="!camIsEnabled" icon="fa-solid fa-video-slash" />
+                </button>
+                
+            </div>
         </div>
     </div>
-    <h3>cameras</h3>
-    <button @click="muteCam">mute cam</button>
-    <div
-        v-for="camera of cameras"
-        :key="camera.deviceId"
-        :class="{ 'text-primary': currentCamera === camera.deviceId }"
-        @click="currentCamera = camera.deviceId"
-    >
-        {{ camera.label }}
-    </div>
-    <h3>microphones</h3>
-    <button @click="muteMic">mute mic</button>
-
-    <div
-        v-for="microfone of microphones"
-        :key="microfone.deviceId"
-        :class="{ 'text-primary': currentMicrophone === microfone.deviceId }"
-        @click="currentMicrophone = microfone.deviceId"
-    >
-        {{ microfone.label }}
-    </div>
-
-    <div ref="videoGrid" id="videoGrid"></div>
 </template>
 <script setup lang="ts">
 import { computed, ref, watch, watchEffect } from "vue";
@@ -271,7 +287,11 @@ function muteMic() {
 
 </script>
 
-<style>
+<style scoped>
+.page {
+    background-color: rgb(32, 29, 34);
+}
+
 .text-primary {
     color: green;
     font-weight: bold;
@@ -305,13 +325,14 @@ function muteMic() {
 }
 
 .btn-round {
-    width: 72px;
-    height: 72px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     border: 1px solid transparent;
     padding: 0;
-    font-size: 2em;
-    background-color: #f9f9f9;
+    font-size: 1.2em;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #f9f9f9;
     cursor: pointer;
     display: inline-flex;
     justify-content: center;
@@ -340,5 +361,23 @@ function muteMic() {
     /* background-color: green; */
     border-color: rgba(255, 255, 255, 0.356);
     border-style: solid;
+}
+
+.footer-bar {
+    background-color: rgb(32, 29, 34);
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 30px 0;
+}
+
+.footer-bar .center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
 }
 </style>
