@@ -86,7 +86,7 @@
                                 :class="{
                                     'active': currentCamera === camera.deviceId,
                                 }"
-                                @click="setCurrentCamera(camera)"
+                                @click="currentCamera = camera.deviceId"
                             >
                                 {{ camera.label }}
                             </li>
@@ -106,7 +106,7 @@
                                     'active':
                                         currentMicrophone === microfone.deviceId,
                                 }"
-                                @click="setCurrentMicrophone(microfone)"
+                                @click="currentMicrophone = microfone.deviceId"
                             >
                                 {{ microfone.label }}
                             </li>
@@ -150,9 +150,7 @@ const {
     currentCamera, 
     currentMicrophone, 
     cameras, 
-    microphones, 
-    setCurrentCamera,
-    setCurrentMicrophone,
+    microphones,
 } = useDevices()
 
 const video = ref<HTMLVideoElement>();
