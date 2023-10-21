@@ -1,20 +1,24 @@
 <template>
     <h1>room</h1>
-    <p>connected: {{ connected }}</p>
-    <button @click="joinRoom()">join-room</button>
+    <p>socket connected: {{ connected }}</p>
+    <!-- <button @click="joinRoom()">join-room</button>
     <br />
     <button @click="connect()">Connect</button>
-    <button @click="disconnect()">Disconnect</button>
+    <button @click="disconnect()">Disconnect</button> -->
     <pre>
         {{ users }}
     </pre>
 
     <div class="video-wrapper">
-        <video ref="video" autoplay></video>
+        <video ref="video" autoplay muted></video>
         <div class="bottom-bar">
-            <button class="btn-round" @click="enabled = !enabled" :title="enabled ? 'Stop cam' : 'Start cam'">
-                <font-awesome-icon v-show="enabled" icon="fa-solid fa-video" />
-                <font-awesome-icon v-show="!enabled" icon="fa-solid fa-video-slash" />
+            <button class="btn-round" @click="muteCam" :title="!camIsEnabled ? 'Start cam' : 'Stop cam'">
+                <font-awesome-icon v-show="camIsEnabled" icon="fa-solid fa-video" />
+                <font-awesome-icon v-show="!camIsEnabled" icon="fa-solid fa-video-slash" />
+            </button>
+            <button class="btn-round" @click="muteMic" :title="!micIsEnabled ? 'Start cam' : 'Stop cam'">
+                <font-awesome-icon v-show="micIsEnabled" icon="fa-solid fa-microphone" />
+                <font-awesome-icon v-show="!micIsEnabled" icon="fa-solid fa-microphone-slash" />
             </button>
         </div>
     </div>
@@ -56,22 +60,22 @@ const route = useRoute();
 const connected = computed(() => state.connected);
 const users = computed(() => state.users);
 
-function connect() {
-    socket.connect();
-}
+// function connect() {
+//     socket.connect();
+// }
 
-function disconnect() {
-    socket.disconnect();
-}
+// function disconnect() {
+//     socket.disconnect();
+// }
 
-// deprecated
-function joinRoom() {
-    const roomId = route.params.roomId;
-    // TODO
-    const userId = "FAKE-USER-ID";
-    console.log("emit ", roomId, userId);
-    socket.emit("join-room", roomId, userId);
-}
+// // deprecated
+// function joinRoom() {
+//     const roomId = route.params.roomId;
+//     // TODO
+//     const userId = "FAKE-USER-ID";
+//     console.log("emit ", roomId, userId);
+//     socket.emit("join-room", roomId, userId);
+// }
 
 // camera e microfone
 const currentCamera = ref<string>();
@@ -201,18 +205,32 @@ function addVideoStream(video, stream) {
     }
 } 
 
+const camIsEnabled = ref(false)
+const micIsEnabled = ref(false)
+
+watchEffect(() => {
+    if (stream.value) {
+        camIsEnabled.value = stream.value.getVideoTracks()[0].enabled
+        micIsEnabled.value = stream.value.getAudioTracks()[0].enabled
+        console.log('BUTTONS watchers', camIsEnabled.value, micIsEnabled.value)
+    }
+});
+
 function muteCam() {
+    camIsEnabled.value = !camIsEnabled.value
     // @ts-ignore
-    stream.value.getVideoTracks().forEach(track => track.enabled = !track.enabled);
+    stream.value.getVideoTracks().forEach(track => track.enabled = camIsEnabled.value);
      // @ts-ignore
-    console.log('mute cam', stream.value.getVideoTracks())
+    console.log('mute cam', stream.value.getVideoTracks()[0])
 }
 
 function muteMic() {
+    micIsEnabled.value = !micIsEnabled.value
+
      // @ts-ignore
-    stream.value.getAudioTracks().forEach(track => track.enabled = !track.enabled);
+    stream.value.getAudioTracks().forEach(track => track.enabled = micIsEnabled.value);
      // @ts-ignore
-    console.log('mute mic', stream.value.getVideoTracks())
+    console.log('mute mic', stream.value.getAudioTracks()[0])
 }
 
 </script>
@@ -245,6 +263,9 @@ function muteMic() {
     bottom: 0;
     width: 100%;
     margin-bottom: 10px;
+    gap: 8px;
+    display: flex;
+    justify-content: center;
 }
 
 .btn-round {
