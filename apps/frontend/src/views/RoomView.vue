@@ -11,6 +11,9 @@
 
     <div class="video-wrapper">
         <video ref="video" autoplay muted></video>
+        <div class="no-camera">
+            <div class="sound-level" :style="{ borderWidth: soundLevel + 'px' }" ></div>
+        </div>
         <div class="bottom-bar">
             <button class="btn-round" @click="muteCam" :title="!camIsEnabled ? 'Start cam' : 'Stop cam'">
                 <font-awesome-icon v-show="camIsEnabled" icon="fa-solid fa-video" />
@@ -54,6 +57,7 @@ import { useRoute } from "vue-router";
 import { useDevicesList, useUserMedia } from "@vueuse/core";
 
 import { Peer } from "peerjs";
+import throttle from 'lodash.throttle'
 
 const route = useRoute();
 
@@ -107,8 +111,40 @@ const { stream, enabled, constraints, restart } = useUserMedia({
     },
 });
 
+const soundLevel = ref(0)
 watch(stream, ()=> {
-    console.log('STREAM CHANGED', stream)
+    if(stream.value) {
+        console.log('STREAM CHANGED', stream)
+    
+        // draw microphone activity levels
+        const audioContext = new AudioContext()
+        const analyser = audioContext.createAnalyser();
+        const microphone = audioContext.createMediaStreamSource(stream.value);
+        const javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
+    
+        analyser.smoothingTimeConstant = 0.3;
+        analyser.fftSize = 1024;
+    
+        microphone.connect(analyser);
+        analyser.connect(javascriptNode);
+        javascriptNode.connect(audioContext.destination);
+    
+        javascriptNode.onaudioprocess = throttle(()=> {
+                var array =  new Uint8Array(analyser.frequencyBinCount);
+                analyser.getByteFrequencyData(array);
+                var values = 0;
+        
+                var length = array.length;
+                for (var i = 0; i < length; i++) {
+                    values += array[i];
+                }
+        
+                var average = values / length;
+                // console.log(average)
+                soundLevel.value = average
+        }, 150)
+    }
+    
 })
 
 watch(constraints, ()=> {
@@ -285,5 +321,24 @@ function muteMic() {
 #videoGrid {
     display: flex;
     flex-direction: column;
+}
+
+.no-camera {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 9, 128, 0.459);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.sound-level {
+    height: 50px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    /* background-color: green; */
+    border-color: rgba(255, 255, 255, 0.356);
+    border-style: solid;
 }
 </style>
