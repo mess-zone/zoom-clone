@@ -5,6 +5,9 @@
     <br>
     <button @click="connect()">Connect</button>
     <button @click="disconnect()">Disconnect</button>
+    <pre>
+        {{ users }}
+    </pre>
 </template>
 <script setup lang="ts">
 import { computed } from "vue";
@@ -14,6 +17,7 @@ import { useRoute } from "vue-router";
 const route = useRoute()
 
 const connected = computed(()=> state.connected)
+const users = computed(()=> state.users)
 
 function connect() {
     socket.connect();

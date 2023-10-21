@@ -1,8 +1,10 @@
 import { reactive } from "vue";
 import { io } from "socket.io-client";
 
+// TODO rename to roomState
 export const state = reactive({
   connected: false,
+  users: {},
   fooEvents: [],
   barEvents: []
 });
@@ -19,12 +21,16 @@ socket.on("disconnect", () => {
   state.connected = false;
 });
 
+// TODO rename to user-joined-room
 socket.on('user-connected', (userId) => {
     console.log('user-connected', userId)
+    state.users[userId] = true
 })
 
+// TODO rename to user-leaved-room
 socket.on('user-disconnected', (userId) => {
     console.log('user-disconnected', userId)
+    state.users[userId] = false
 })
 
 socket.on("foo", (...args) => {
