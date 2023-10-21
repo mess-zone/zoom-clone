@@ -40,7 +40,7 @@
     <div ref="videoGrid" id="videoGrid"></div>
 </template>
 <script setup lang="ts">
-import { computed, ref, watchEffect } from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 import { state, socket } from "../config/socket";
 import { useRoute } from "vue-router";
 
@@ -79,6 +79,7 @@ const {
 } = useDevicesList({
     requestPermissions: true,
     onUpdated() {
+        console.log('use devices list on updated')
         if (!cameras.value.find((i) => i.deviceId === currentCamera.value)) {
             currentCamera.value = cameras.value[0]?.deviceId;
         }
@@ -89,12 +90,34 @@ const {
 });
 
 const video = ref<HTMLVideoElement>();
-const { stream, enabled } = useUserMedia({
+const { stream, enabled, constraints, restart } = useUserMedia({
+    autoSwitch: true, 
     constraints: { 
-        video: { deviceId: currentCamera.value },
-        audio: { deviceId: currentMicrophone.value },
+        // @ts-ignore
+        video: { deviceId: currentCamera },
+        // @ts-ignore
+        audio: { deviceId: currentMicrophone },
     },
 });
+
+watch(stream, ()=> {
+    console.log('STREAM CHANGED', stream)
+})
+
+watch(constraints, ()=> {
+    console.log('STREAM CONSTRAINS CHANGED', constraints)
+})
+
+watch(currentCamera, ()=> {
+    console.log('current camera CHANGED', currentCamera)
+    restart()
+})
+
+watch(currentMicrophone, ()=> {
+    console.log('currentMicrophone CHANGED', currentMicrophone)
+    restart()
+})
+
 
 enabled.value = true
 
