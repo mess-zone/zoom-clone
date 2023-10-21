@@ -122,8 +122,10 @@ import { computed, ref, watch, watchEffect } from "vue";
 import { state, socket } from "../config/socket";
 import { useRoute } from "vue-router";
 import { useRoom } from '../composables/use-room'
+// import { useStream } from '../composables/use-stream'
+import { useDevices } from '../composables/use-devices'
 
-import { useDevicesList, useUserMedia } from "@vueuse/core";
+import { useUserMedia } from "@vueuse/core";
 
 import { Peer } from "peerjs";
 import throttle from "lodash.throttle";
@@ -142,25 +144,9 @@ function disconnect() {
     socket.disconnect();
 }
 
-// camera e microfone
-const currentCamera = ref<string>();
-const currentMicrophone = ref<string>();
-const { videoInputs: cameras, audioInputs: microphones } = useDevicesList({
-    requestPermissions: true,
-    onUpdated() {
-        console.log("use devices list on updated");
-        if (!cameras.value.find((i) => i.deviceId === currentCamera.value)) {
-            currentCamera.value = cameras.value[0]?.deviceId;
-        }
-        if (
-            !microphones.value.find(
-                (i) => i.deviceId === currentMicrophone.value
-            )
-        ) {
-            currentMicrophone.value = microphones.value[0]?.deviceId;
-        }
-    },
-});
+// const { localStream } = useStream()
+
+const { currentCamera, currentMicrophone, cameras, microphones } = useDevices()
 
 const video = ref<HTMLVideoElement>();
 const { stream, enabled, constraints, restart } = useUserMedia({
@@ -498,3 +484,4 @@ function handleLeaveRoom() {
     font-weight: bold;
 }
 </style>
+../composables/use-devices
