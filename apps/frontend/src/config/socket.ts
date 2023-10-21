@@ -8,7 +8,7 @@ export const state = reactive({
 });
 
 const URL: string = import.meta.env.VITE_SERVER_URL
-
+console.log('SERVER URL', URL)
 export const socket = io(URL);
 
 socket.on("connect", () => {
