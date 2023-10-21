@@ -86,8 +86,8 @@ const {
 const video = ref<HTMLVideoElement>();
 const { stream, enabled } = useUserMedia({
     constraints: { 
-        video: { deviceId: currentCamera },
-        audio: { deviceId: currentMicrophone },
+        video: { deviceId: currentCamera.value },
+        audio: { deviceId: currentMicrophone.value },
     },
 });
 
