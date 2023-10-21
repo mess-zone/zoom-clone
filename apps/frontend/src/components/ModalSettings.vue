@@ -8,42 +8,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    testando
-                    <!-- <div class="config-group">
-                        <h3>Video</h3>
-                        <h4>Camera</h4>
-                        <ul class="select-list">
-                            <li
-                                v-for="camera of cameras"
-                                :key="camera.deviceId"
-                                class="option"
-                                :class="{
-                                    'active': currentCamera === camera.deviceId,
-                                }"
-                                @click="currentCamera = camera.deviceId"
-                            >
-                                {{ camera.label }}
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="config-group">
-                        <h3>Audio</h3>
-                        <h4>Microfone</h4>
-                        <ul class="select-list">
-                            <li
-                                v-for="microfone of microphones"
-                                :key="microfone.deviceId"
-                                class="option"
-                                :class="{
-                                    'active':
-                                        currentMicrophone === microfone.deviceId,
-                                }"
-                                @click="currentMicrophone = microfone.deviceId"
-                            >
-                                {{ microfone.label }}
-                            </li>
-                        </ul>
-                    </div> -->
+                    <slot></slot>
                 </div>
             </div>
         </div>
