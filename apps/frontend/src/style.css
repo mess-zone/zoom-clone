@@ -90,3 +90,18 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+
+
+/**
+Deprecated
+*/
+#videoGrid > video {
+  background-color: rgb(20, 20, 20);
+  width: 640px;
+  height: 480px;
+  position: relative;
+  border-radius: 15px;
+  overflow: hidden;
+  object-fit: cover;
+}

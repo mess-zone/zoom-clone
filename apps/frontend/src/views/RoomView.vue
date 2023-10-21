@@ -1,17 +1,18 @@
 <template>
     <div class="page">
 
-        <div class="video-wrapper">
-            <video ref="video" autoplay muted></video>
-            <div class="no-camera">
-                <div
-                    class="sound-level"
-                    :style="{ borderWidth: soundLevel + 'px' }"
-                ></div>
+
+        <div ref="videoGrid" id="videoGrid">
+            <div class="video-wrapper my-video">
+                <video ref="video" autoplay muted></video>
+                <div class="no-camera">
+                    <div
+                        class="sound-level"
+                        :style="{ borderWidth: soundLevel + 'px' }"
+                    ></div>
+                </div>
             </div>
         </div>
-
-        <div ref="videoGrid" id="videoGrid"></div>
         <p>socket connected: {{ connected }}</p>
         <!-- <button @click="joinRoom()">join-room</button>
         <br />
@@ -294,6 +295,7 @@ const videoGrid = ref<HTMLDivElement>();
 function addVideoStream(video, stream) {
     console.log("ADD VIDEO STREAM", video);
     video.srcObject = stream;
+    video.classList.add('video-remote')
     video.addEventListener("loadedmetadata", () => {
         video.play();
     });
@@ -380,6 +382,7 @@ function handleLeaveRoom() {
     object-fit: cover;
 }
 
+
 .btn-round {
     width: 48px;
     height: 48px;
@@ -415,8 +418,15 @@ function handleLeaveRoom() {
 
 #videoGrid {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 30px;
 }
+
 
 .no-camera {
     position: absolute;
