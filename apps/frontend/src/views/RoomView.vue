@@ -19,6 +19,7 @@
         </div>
     </div>
     <h3>cameras</h3>
+    <button @click="muteCam">mute cam</button>
     <div
         v-for="camera of cameras"
         :key="camera.deviceId"
@@ -28,6 +29,8 @@
         {{ camera.label }}
     </div>
     <h3>microphones</h3>
+    <button @click="muteMic">mute mic</button>
+
     <div
         v-for="microfone of microphones"
         :key="microfone.deviceId"
@@ -197,6 +200,16 @@ function addVideoStream(video, stream) {
         videoGrid.value.append(video)
     }
 } 
+
+function muteCam() {
+    stream.value.getVideoTracks().forEach(track => track.enabled = !track.enabled);
+    console.log('mute cam', stream.value.getVideoTracks())
+}
+
+function muteMic() {
+    stream.value.getAudioTracks().forEach(track => track.enabled = !track.enabled);
+    console.log('mute mic', stream.value.getVideoTracks())
+}
 
 </script>
 
