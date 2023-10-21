@@ -65,7 +65,7 @@
             <h4>{{ roomId }}</h4>
         </div>
 
-        <div v-if="settingModalIsOpen" class="modal-overlay" @click="closeSettingsModal">
+        <div v-if="settingsModalIsOpen" class="modal-overlay" @click="closeSettingsModal">
             <div class="modal" @click.stop="">
                 <div class="modal-header">
                     <h2>Settings</h2>
@@ -323,14 +323,14 @@ function muteMic() {
 }
 
 
-const settingModalIsOpen = ref(false)
+const settingsModalIsOpen = ref(false)
 
 function openSettingsModal() {
-    settingModalIsOpen.value = true
+    settingsModalIsOpen.value = true
 }
 
 function closeSettingsModal() {
-    settingModalIsOpen.value = false
+    settingsModalIsOpen.value = false
 }
 
 function handleLeaveRoom() {
