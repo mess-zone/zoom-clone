@@ -19,8 +19,5 @@
         "eslint": "8.15.0",
         "prettier": "2.5.1",
         "turbo": "1.2.12"
-    },
-    "dependencies": {
-        "@vueuse/core": "^10.5.0"
     }
 }

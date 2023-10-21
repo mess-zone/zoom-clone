@@ -9,10 +9,15 @@
         {{ users }}
     </pre>
 
-    <video ref="video" autoplay class="h-100 w-auto"></video>
-    <button @click="enabled = !enabled">
-        {{ enabled ? "Stop" : "Start" }}
-    </button>
+    <div class="video-wrapper">
+        <video ref="video" autoplay></video>
+        <div class="bottom-bar">
+            <button class="btn-round" @click="enabled = !enabled" :title="enabled ? 'Stop cam' : 'Start cam'">
+                <font-awesome-icon v-show="enabled" icon="fa-solid fa-video" />
+                <font-awesome-icon v-show="!enabled" icon="fa-solid fa-video-slash" />
+            </button>
+        </div>
+    </div>
     <h3>cameras</h3>
     <div
         v-for="camera of cameras"
@@ -101,5 +106,43 @@ watchEffect(() => {
 .text-primary {
     color: green;
     font-weight: bold;
+}
+
+.video-wrapper {
+    background-color: rgb(50, 50, 50);
+    width: 640px;
+    height: 480px;
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.video-wrapper video {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    inset: 0;
+    object-fit: cover;
+}
+
+.video-wrapper .bottom-bar {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.btn-round {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    padding: 0;
+    font-size: 2em;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
 }
 </style>
