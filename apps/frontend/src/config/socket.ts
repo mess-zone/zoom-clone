@@ -19,6 +19,14 @@ socket.on("disconnect", () => {
   state.connected = false;
 });
 
+socket.on('user-connected', (userId) => {
+    console.log('user-connected', userId)
+})
+
+socket.on('user-disconnected', (userId) => {
+    console.log('user-disconnected', userId)
+})
+
 socket.on("foo", (...args) => {
     // @ts-ignore
   state.fooEvents.push(args);

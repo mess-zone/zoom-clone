@@ -17,9 +17,9 @@ const io = require('socket.io')(server, {
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
 
-app.get('/', (req, res) => {
-    res.redirect(`/${uuidV4()}`)
-})
+// app.get('/', (req, res) => {
+//     res.redirect(`/${uuidV4()}`)
+// })
 
 // generate room id
 app.get('/api/room', (req, res) => {
@@ -27,9 +27,9 @@ app.get('/api/room', (req, res) => {
 })
 
 
-app.get('/:room', (req, res) => {
-    res.render('room', { roomId: req.params.room })
-})
+// app.get('/:room', (req, res) => {
+//     res.render('room', { roomId: req.params.room })
+// })
 
 
 io.on('connection', socket => {
