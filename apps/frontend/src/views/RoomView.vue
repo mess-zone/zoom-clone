@@ -65,56 +65,58 @@
             <h4>{{ roomId }}</h4>
         </div>
 
-        <div v-if="settingsModalIsOpen" class="modal-overlay" @click="closeSettingsModal">
-            <div class="modal" @click.stop="">
-                <div class="modal-header">
-                    <h2>Settings</h2>
-                    <button class="close-icon" @click="closeSettingsModal">
-                        <font-awesome-icon icon="fa-solid fa-xmark" />
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="config-group">
-                        <h3>Video</h3>
-                        <h4>Camera</h4>
-                        <!-- <button @click="muteCam">mute cam</button> -->
-                        <ul class="select-list">
-                            <li
-                                v-for="camera of cameras"
-                                :key="camera.deviceId"
-                                class="option"
-                                :class="{
-                                    'active': currentCamera === camera.deviceId,
-                                }"
-                                @click="currentCamera = camera.deviceId"
-                            >
-                                {{ camera.label }}
-                            </li>
-                        </ul>
+        <Teleport to="body">
+            <div v-if="settingsModalIsOpen" class="modal-overlay" @click="closeSettingsModal">
+                <div class="modal" @click.stop="">
+                    <div class="modal-header">
+                        <h2>Settings</h2>
+                        <button class="close-icon" @click="closeSettingsModal">
+                            <font-awesome-icon icon="fa-solid fa-xmark" />
+                        </button>
                     </div>
-                    <div class="config-group">
-                        <h3>Audio</h3>
-                        <h4>Microfone</h4>
-                        <!-- <button @click="muteMic">mute mic</button> -->
-    
-                        <ul class="select-list">
-                            <li
-                                v-for="microfone of microphones"
-                                :key="microfone.deviceId"
-                                class="option"
-                                :class="{
-                                    'active':
-                                        currentMicrophone === microfone.deviceId,
-                                }"
-                                @click="currentMicrophone = microfone.deviceId"
-                            >
-                                {{ microfone.label }}
-                            </li>
-                        </ul>
+                    <div class="modal-body">
+                        <div class="config-group">
+                            <h3>Video</h3>
+                            <h4>Camera</h4>
+                            <!-- <button @click="muteCam">mute cam</button> -->
+                            <ul class="select-list">
+                                <li
+                                    v-for="camera of cameras"
+                                    :key="camera.deviceId"
+                                    class="option"
+                                    :class="{
+                                        'active': currentCamera === camera.deviceId,
+                                    }"
+                                    @click="currentCamera = camera.deviceId"
+                                >
+                                    {{ camera.label }}
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="config-group">
+                            <h3>Audio</h3>
+                            <h4>Microfone</h4>
+                            <!-- <button @click="muteMic">mute mic</button> -->
+        
+                            <ul class="select-list">
+                                <li
+                                    v-for="microfone of microphones"
+                                    :key="microfone.deviceId"
+                                    class="option"
+                                    :class="{
+                                        'active':
+                                            currentMicrophone === microfone.deviceId,
+                                    }"
+                                    @click="currentMicrophone = microfone.deviceId"
+                                >
+                                    {{ microfone.label }}
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </Teleport>
     </div>
 </template>
 <script setup lang="ts">
