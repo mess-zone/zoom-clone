@@ -381,21 +381,6 @@ function handleLeaveRoom() {
     background-color: rgb(219, 39, 52);
 }
 
-.close-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: 1px solid transparent;
-    padding: 0;
-    font-size: 1.5em;
-    color:rgba(0, 0, 0, 0.6);
-    cursor: pointer;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-}
-
-
 .no-camera {
     position: absolute;
     inset: 0;
@@ -435,28 +420,11 @@ function handleLeaveRoom() {
     gap: 10px;
 }
 
-.modal-overlay {
-    background-color: rgba(0, 0, 0, 0.781);
-    position: fixed;
-    inset: 0;
-    display: grid;
-    /* justify-items: center;
-    align-items: center; */
-    place-items: center;
-}
 
-.modal {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-}
+/**
+Settings modal content
 
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 15px;
-}
+*/
 
 .config-group {
     border-top: 1px solid rgba(0, 0, 0, 0.1);

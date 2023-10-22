@@ -69,29 +69,5 @@ function close() {
     align-items: flex-start;
     margin-bottom: 15px;
 }
-/* 
-.config-group {
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-    padding: 15px 0;
-}
 
-.select-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.select-list li {
-    padding: 5px 10px;
-    cursor: pointer;
-}
-
-.select-list li:hover {
-    background-color: rgba(0, 0, 0, 0.1);
-}
-
-.select-list li.active {
-    color: green;
-    font-weight: bold;
-} */
 </style>
