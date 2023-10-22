@@ -1,5 +1,11 @@
 <template>
     <div class="page">
+        <div id="streamGrid">
+            <StreamPreview v-for="item in clientsComputed" :key="item.peerId">
+                {{ item }} <span>{{ item.peerId === userId ? 'LOCAL' : 'REMOTE' }}</span>
+            </StreamPreview>
+        </div>
+
         <div ref="videoGrid" id="videoGrid">
             <div class="video-wrapper my-video">
                 <video ref="video" autoplay muted></video>
@@ -88,6 +94,7 @@ import { Peer } from "peerjs";
 
 import SettingsModal from "../components/organisms/SettingsModal.vue";
 import ToastContainer from "../components/molecules/ToastContainer.vue";
+import StreamPreview from "../components/molecules/StreamPreview.vue";
 
 const route = useRoute();
 
@@ -95,6 +102,10 @@ const { addToast } = useToasts()
 
 const { room } = useRoomStore()
 const { rId: roomId, clients, state } = toRefs(room)
+
+const clientsComputed = computed(() => {
+    return Object.fromEntries(clients.value)
+})
 
 room.setRoomId(''+route.params.roomId)
 room.active = true
@@ -202,6 +213,11 @@ function handleLeaveRoom() {
 </script>
 
 <style scoped>
+
+.clients {
+    background-color: gray;
+}
+
 .page {
     background-color: rgb(32, 29, 34);
     position: absolute;
@@ -322,6 +338,30 @@ function handleLeaveRoom() {
     display: flex;
     gap: 8px;
     align-items: center;
+}
+
+
+
+#streamGrid {
+    background-color: pink;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  padding: 30px;
+}
+
+#streamGrid > video {
+  background-color: rgb(20, 20, 20);
+  width: 640px;
+  height: 480px;
+  position: relative;
+  border-radius: 15px;
+  overflow: hidden;
+  object-fit: cover;
 }
 
 </style>
