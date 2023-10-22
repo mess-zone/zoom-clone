@@ -52,6 +52,14 @@ io.on('connection', socket => {
     })
 })
 
+io.of("/").adapter.on("join-room", (room, id) => {
+    console.log(`!!! socket ${id} has joined room ${room}`);
+});
+
+io.of("/").adapter.on("leave-room", (room, id) => {
+    console.log(`!! socket ${id} has leaved room ${room}`);
+});
+
 server.listen(3000, () => {
     console.log('server started on port', 3000)
 })
