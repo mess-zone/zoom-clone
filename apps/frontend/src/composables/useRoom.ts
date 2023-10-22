@@ -13,11 +13,20 @@ export function useRoom(id: MaybeRefOrGetter<string>) {
 
     const clients = reactive(new Map<string, User>())
 
-    function joinRoom(userId: MaybeRefOrGetter<string>) {
+    async function joinRoom(userId: MaybeRefOrGetter<string>) {
         const uId = toValue(userId)
         console.log('[useRoom] join-meeting', rId.value, uId)
-        socket.emit("join-meeting", rId.value, uId);
-        clients.set(uId, { peerId: uId })
+        try {
+            const response = await socket.emitWithAck("join-meeting", rId.value, uId);
+            console.log('CALLBACK');
+              
+            response.forEach(peer => {
+                console.log(peer)
+                clients.set(peer.peerId, peer)
+            });
+        } catch(e) {
+            console.error(e)
+        }
     }
 
     function leaveRoom(peerId: MaybeRefOrGetter<string>) {

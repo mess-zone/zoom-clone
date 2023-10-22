@@ -65,7 +65,7 @@ function leaveUser(roomId, socketId) {
 
 io.on('connection', socket => {
 
-    socket.on('join-meeting', (roomId, userId) => {
+    socket.on('join-meeting', (roomId, userId, callback) => {
         console.log('[join-meeting]', socket.id, roomId, userId)
         socket.join(roomId)
         joinUser({
@@ -73,6 +73,10 @@ io.on('connection', socket => {
             socketId: socket.id,
             peerId: userId,
         })
+
+        const users = Object.fromEntries(rooms.get(roomId))
+        const peerIds = Object.values(users).map(u => ({ peerId: u.peerId }))
+        callback(peerIds)
 
         // TODO rename to joined-meeting
         socket.to(roomId).emit('user-connected', userId)
