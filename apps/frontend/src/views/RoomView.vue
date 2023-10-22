@@ -34,11 +34,12 @@
         </pre>
 
         <div class="footer-bar">
-            <div class="toast-container">
+            <TransitionGroup name="list" tag="div" class="toast-container">
                 <div class="toast" v-for="toast in toasts" :key="toast.id">
                    {{ toast.id }} {{ toast.message }}
                 </div>
-            </div>
+            </TransitionGroup>
+      
             <h4>{{ roomId }}</h4>
             <div class="center">
                 <button
@@ -315,21 +316,40 @@ function handleLeaveRoom() {
 .footer-bar .toast-container {
     position: absolute;
     bottom: 100%;
-    padding: 20px;
     left: 0;
     width: 100%;
-    gap: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    margin: 10px 0;
 }
 
 .toast {
+    display: inline-block;
     background-color: rgb(53, 56, 60);
     color: rgb(167, 169, 172);
     padding: 15px 20px;
     border-radius: 5px;
     font-size: .8em;
     font-weight: bold;
+    margin: 10px 20px;
 }
+
+/**
+Toast transitions
+*/
+
+.list-move, /* apply transition to moving elements */
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+
+.list-enter-from {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(-30px);
+}
+
 </style>

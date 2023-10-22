@@ -16,12 +16,26 @@ export function useToasts() {
         t.id = uuidV4()
         toasts.value.push(t)
         console.log('add toast', t)
+
+        setTimeout(()=> {
+            console.log('remove toast', t)
+            const index = toasts.value.indexOf(t);
+
+            toasts.value.splice(index, 1);
+        }, 5000)
     }
 
-    addToast({ message: '3f063f3c-5bc5-467b-8fe2-19ab9eb483a0 entrou na reunião'})
-    addToast({ message: '3f063f3c-5bc5-467b-8fe2-19ab9eb483a0 entrou na reunião'})
-    addToast({ message: '3f063f3c-5bc5-467b-8fe2-19ab9eb483a0 entrou na reunião'})
-    addToast({ message: '3f063f3c-5bc5-467b-8fe2-19ab9eb483a0 entrou na reunião'})
+    setTimeout(()=> {
+        addToast({ message: '1  3f063f3c-5bc5-467b-8fe2-19ab9eb483a0 entrou na reunião'})
+    }, 1000)
+
+    setTimeout(()=> {
+        addToast({ message: '2  3f063f3c-5bc5-467b-8fe2-19ab9eb483a0 entrou na reunião'})
+    }, 2000)
+
+    setTimeout(()=> {
+        addToast({ message: '3  3f063f3c-5bc5-467b-8fe2-19ab9eb483a0 entrou na reunião'})
+    }, 4000)
 
     return {
         toasts,
