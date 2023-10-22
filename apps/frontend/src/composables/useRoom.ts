@@ -5,29 +5,47 @@ interface User {
     peerId: string,
 }
 
-export function useRoom(id?: MaybeRefOrGetter<string>) {
+export function useRoom() {
 
     // TODO rename to roomId
-    const rId = ref(toValue(id))
+    const rId = ref<string>()
 
     const clients = reactive(new Map<string, User>())
 
-    // entrar em sala com id definido
-    if(!rId.value) {
-        // gerar novo id
-        createRoom()
-    }
+    // if(!rId.value) {
+    //     // gerar novo id
+    //     createRandomRoomId()
+    // }
 
-    async function createRoom() {
+    /**
+     * configura socket para acessar a sala com id especificado.
+     * 
+     * 
+     * se o id não for especificado, cria um novo id único
+     * @param id 
+     * @returns 
+     */
+    async function setRoomId(roomId?: MaybeRefOrGetter<string>) {
+        const id = toValue(roomId)
+
+        if(id) {
+            rId.value = id
+            return
+        }
+
         try {
-            const response = await socket.emitWithAck('create-meeting')
-            console.log('ROOM ID NOT DEFINED, CREATING MEETING ID', response)
+            const response = await getRandomId()
+            console.log('ROOM ID NOT DEFINED, CREATING RANDOM MEETING ID', response)
     
             rId.value = response.roomId
 
         } catch (error) {
             console.error(error);
         }
+    }
+
+    async function getRandomId() {
+        return socket.emitWithAck('create-meeting')
     }
 
     async function joinRoom(userId: MaybeRefOrGetter<string>) {
@@ -58,6 +76,7 @@ export function useRoom(id?: MaybeRefOrGetter<string>) {
         clients,
         joinRoom,
         leaveRoom,
+        setRoomId,
         // deprecated
         state, socket,
     }

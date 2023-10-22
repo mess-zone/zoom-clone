@@ -78,9 +78,10 @@
     </div>
 </template>
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, toRefs } from "vue";
 import { useRoute } from "vue-router";
-import { useRoom } from '../composables/useRoom'
+// import { useRoom } from '../composables/useRoom'
+import { useRoomStore } from '../stores/useRoomStore'
 import { useToasts } from '../composables/useToasts'
 import { useLocalStream } from '../composables/useLocalStream'
 
@@ -94,10 +95,14 @@ const route = useRoute();
 
 const { addToast } = useToasts()
 
-const { rId: roomId, clients, joinRoom, leaveRoom, state, socket } = useRoom(''+route.params.roomId)
+const { room } = useRoomStore()
+const { rId: roomId, clients, state } = toRefs(room)
 
-const connected = computed(() => state.connected);
-const size = computed(() => clients.size);
+room.setRoomId(''+route.params.roomId)
+// const { rId: roomId, clients, joinRoom, leaveRoom, state, socket } = useRoom(''+route.params.roomId)
+
+const connected = computed(() => state.value.connected);
+const size = computed(() => clients.value.size);
 
 const video = ref<HTMLVideoElement>();
 
@@ -124,17 +129,17 @@ peer.on("call", (call) => {
     });
 });
 
-socket.on("user-connected", (userId) => {
+room.socket.on("user-connected", (userId) => {
     console.log("USER-connected", userId, stream.value);
-    clients.set(userId, { peerId: userId })
+    clients.value.set(userId, { peerId: userId })
     addToast({ message: `${userId} entrou na reunião`})
     connectToNewUser(userId, stream.value);
 });
 
-socket.on("user-disconnected", (userId) => {
+room.socket.on("user-disconnected", (userId) => {
     console.log(userId, "disconnected");
     console.log(peers);
-    clients.delete(userId)
+    clients.value.delete(userId)
     addToast({ message: `${userId} saiu da reunião`})
     // if(peers[userId]) {
     peers[userId].close();
@@ -148,7 +153,7 @@ const userId = ref<string>('')
 peer.on("open", (peerId) => {
     userId.value = peerId
     console.log("peer connection opened", userId.value);
-    joinRoom(userId)
+    room.joinRoom(userId)
 });
 
 
@@ -192,7 +197,7 @@ function closeSettingsModal() {
 }
 
 function handleLeaveRoom() {
-    leaveRoom(userId)
+    room.leaveRoom(userId)
     router.push({
         name: 'home'
     })

@@ -1,31 +1,35 @@
 <template>
     <div>
         <button @click="handleNewRoom">new room</button>
+        <!-- {{ room.rId }} -->
     </div>
 </template>
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { socket } from '../config/socket';
+import { useRoomStore } from '../stores/useRoomStore'
+import { watch } from 'vue';
 
-const router = useRouter()
+const router = useRouter() 
 
-async function handleNewRoom() {
-    try {
-        const response = await socket.emitWithAck('create-meeting')
-        console.log('CREATING MEETING RESPONSE', response)
+const { room } = useRoomStore()
 
-        const roomId = response.roomId
+function handleNewRoom() {
+    room.setRoomId()
+}
+
+watch(() => room.rId, () => {
+    console.log('NEWWWW', room.rId)
+    if(room.rId) {
+        console.log('handle new room', room.rId)
         router.push({
             name: 'room',
             params: {
-                roomId,
+                roomId: room.rId,
             }
         })
-    } catch (error) {
-        console.error(error);
     }
-}
+})
 
 </script>
 
