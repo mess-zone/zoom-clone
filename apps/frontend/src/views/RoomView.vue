@@ -1,7 +1,7 @@
 <template>
     <div class="page">
-        <div id="streamGrid">
-            <StreamPreview v-for="item in clientsComputed" :key="item.peerId">
+        <div ref="streamGrid" id="streamGrid">
+            <StreamPreview v-for="item in clientsComputed" :key="item.peerId" :id="item.peerId">
                 {{ item }} <span>{{ item.peerId === userId ? 'LOCAL' : 'REMOTE' }}</span>
             </StreamPreview>
         </div>
@@ -129,17 +129,29 @@ const peer = new Peer();
 
 const peers = {};
 
+const userId = ref<string>('')
+
+peer.on("open", (peerId) => {
+    userId.value = peerId
+    console.log("peer connection opened", userId.value);
+    room.joinRoom(userId)
+});
+
+// 
 peer.on("call", (call) => {
+    console.log('[peer] atendendo chamada de ?, sending my stream:')
+    console.log(stream.value)
     call.answer(stream.value);
 
     const video = document.createElement("video");
     call.on("stream", (userVideoStream) => {
+        console.log('[peer] stream remoto recebido ao atender chamada:', userVideoStream)
         addVideoStream(video, userVideoStream);
     });
 });
 
 room.socket.on("user-connected", (userId) => {
-    console.log("USER-connected", userId, stream.value);
+    console.log(`user ${userId} joined the room ?`);
     clients.value.set(userId, { peerId: userId })
     addToast({ message: `${userId} entrou na reunião`})
     connectToNewUser(userId, stream.value);
@@ -157,20 +169,17 @@ room.socket.on("user-disconnected", (userId) => {
 
 
 
-const userId = ref<string>('')
-
-peer.on("open", (peerId) => {
-    userId.value = peerId
-    console.log("peer connection opened", userId.value);
-    room.joinRoom(userId)
-});
 
 
-function connectToNewUser(userId, stream) {
-    console.log("connecting to new user", userId, stream);
-    const call = peer.call(userId, stream);
+
+
+
+function connectToNewUser(userId, myStream) {
+    console.log(`[peer] calling user ${userId} who joinded room ?, sendig my stream: `, myStream);
+    const call = peer.call(userId, myStream);
     const video = document.createElement("video");
     call.on("stream", (userVideoStream) => {
+        console.log('[peer] stream remoto recebido ao ligar para usuário:', userVideoStream)
         addVideoStream(video, userVideoStream);
     });
     call.on("close", () => {
@@ -182,8 +191,11 @@ function connectToNewUser(userId, stream) {
 
 const videoGrid = ref<HTMLDivElement>();
 
+const streamGrid = ref<HTMLDivElement>();
+
 function addVideoStream(video, stream) {
-    console.log("ADD VIDEO STREAM", video);
+    // console.log("ADD VIDEO STREAM", video) 
+    // streamGrid.value?.querySelectorAll('.stream-preview')
     video.srcObject = stream;
     video.classList.add('video-remote')
     video.addEventListener("loadedmetadata", () => {

@@ -26,17 +26,17 @@ export function useLocalStream(element: MaybeRefOrGetter<HTMLVideoElement | unde
     enabled.value = true
 
     watch(currentCamera, () => {
-        console.log("currentCamera CHANGED", currentCamera);
+        // console.log("currentCamera CHANGED", currentCamera);
         restart();
     });
     
     watch(currentMicrophone, () => {
-        console.log("currentMicrophone CHANGED", currentMicrophone);
+        // console.log("currentMicrophone CHANGED", currentMicrophone);
         restart();
     });
 
     watchEffect(() => {
-        console.log("WATCH EFFECT stream changed", stream.value);
+        // console.log("WATCH EFFECT stream changed", stream.value);
         if (videoEl.value) {
             videoEl.value.srcObject = stream.value!;
             // video.value.addEventListener('loadedmetadata', () => {
@@ -84,7 +84,7 @@ export function useLocalStream(element: MaybeRefOrGetter<HTMLVideoElement | unde
 
     const soundLevel = ref(0);
     watch(stream, () => {
-        console.log("SOUND LEVEL STREAM CHANGED", stream);
+        // console.log("SOUND LEVEL STREAM CHANGED", stream);
         if (stream.value) {
             // draw microphone activity levels
             const audioContext = new AudioContext();

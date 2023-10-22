@@ -32,7 +32,7 @@ export function useRoom() {
 
         try {
             const response = await getRandomId()
-            console.log('ROOM ID NOT DEFINED, CREATING RANDOM MEETING ID', response)
+            // console.log('ROOM ID NOT DEFINED, CREATING RANDOM MEETING ID', response)
     
             rId.value = response.roomId
 
@@ -50,10 +50,9 @@ export function useRoom() {
         console.log('[useRoom] join-meeting', rId.value, uId)
         try {
             const response = await socket.emitWithAck("join-meeting", rId.value, uId);
-            console.log('CALLBACK');
-              
+
             response.forEach(peer => {
-                console.log(peer)
+                // console.log(peer)
                 clients.set(peer.peerId, peer)
             });
         } catch(e) {
