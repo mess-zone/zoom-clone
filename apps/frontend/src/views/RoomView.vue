@@ -34,6 +34,11 @@
         </pre>
 
         <div class="footer-bar">
+            <div class="toast-container">
+                <div class="toast" v-for="toast in toasts" :key="toast.id">
+                   {{ toast.id }} {{ toast.message }}
+                </div>
+            </div>
             <h4>{{ roomId }}</h4>
             <div class="center">
                 <button
@@ -156,7 +161,7 @@ peer.on("open", (id) => {
     userId.value = id
     console.log("peer connection opened", userId.value);
     joinRoom(userId)
-    addToast({ message: 'Você entrou na reunião' })
+    // addToast({ message: 'Você entrou na reunião' })
 });
 
 
@@ -305,5 +310,26 @@ function handleLeaveRoom() {
     justify-content: center;
     align-items: center;
     gap: 10px;
+}
+
+.footer-bar .toast-container {
+    position: absolute;
+    bottom: 100%;
+    padding: 20px;
+    left: 0;
+    width: 100%;
+    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.toast {
+    background-color: rgb(53, 56, 60);
+    color: rgb(167, 169, 172);
+    padding: 15px 20px;
+    border-radius: 5px;
+    font-size: .8em;
+    font-weight: bold;
 }
 </style>
