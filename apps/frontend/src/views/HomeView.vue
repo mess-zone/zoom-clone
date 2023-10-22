@@ -6,14 +6,16 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { serverAPI } from '../config/axios'
+import { socket } from '../config/socket';
 
 const router = useRouter()
 
 async function handleNewRoom() {
     try {
-        const roomId = await createRoomId()
-        console.log('created roomId', roomId)
+        const response = await socket.emitWithAck('create-meeting')
+        console.log('CREATING MEETING RESPONSE', response)
+
+        const roomId = response.roomId
         router.push({
             name: 'room',
             params: {
@@ -23,15 +25,6 @@ async function handleNewRoom() {
     } catch (error) {
         console.error(error);
     }
-}
-
-async function createRoomId() {
-  try {
-    const response = await serverAPI.get('/room');
-    return response.data.roomId
-  } catch (error) {
-    console.error(error);
-  }
 }
 
 </script>

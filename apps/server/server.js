@@ -24,6 +24,7 @@ const io = require('socket.io')(server, {
 // })
 
 // generate room id
+// deprecated
 app.get('/api/room', (req, res) => {
     res.json({ roomId: uuidV4() })
 })
@@ -64,6 +65,11 @@ function leaveUser(roomId, socketId) {
 }
 
 io.on('connection', socket => {
+
+    socket.on('create-meeting', (callback) => {
+        console.log('[create-meeting]')
+        callback({ roomId: uuidV4() })
+    } )
 
     socket.on('join-meeting', (roomId, userId, callback) => {
         console.log('[join-meeting]', socket.id, roomId, userId)
