@@ -85,6 +85,7 @@
 import { computed, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useRoom } from '../composables/useRoom'
+import { useToasts } from '../composables/useToasts'
 import { useLocalStream } from '../composables/useLocalStream'
 
 import { Peer } from "peerjs";
@@ -93,6 +94,8 @@ import router from "../routes";
 import SettingsModal from "../components/organisms/SettingsModal.vue";
 
 const route = useRoute();
+
+const { toasts, addToast } = useToasts()
 
 const { rId: roomId, clients, joinRoom, leaveRoom, state, socket } = useRoom(''+route.params.roomId)
 
@@ -153,6 +156,7 @@ peer.on("open", (id) => {
     userId.value = id
     console.log("peer connection opened", userId.value);
     joinRoom(userId)
+    addToast({ message: 'Você entrou na reunião' })
 });
 
 
