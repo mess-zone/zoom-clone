@@ -24,10 +24,6 @@
                 </div>
             </div>
         </div>
-        <pre>
-            {{ users }}
-        </pre>
-
         <div class="footer-bar">
             <ToastContainer class="bottom-toast-container" />
       
@@ -73,7 +69,7 @@
                     <font-awesome-icon icon="fa-solid fa-phone" rotation="180" />
                 </button>
             </div>
-            <h4>{{ roomId }}</h4>
+            <h4>{{ size }}</h4>
         </div>
 
         <Teleport to="body">
@@ -101,7 +97,7 @@ const { addToast } = useToasts()
 const { rId: roomId, clients, joinRoom, leaveRoom, state, socket } = useRoom(''+route.params.roomId)
 
 const connected = computed(() => state.connected);
-const users = computed(() => state.users);
+const size = computed(() => clients.size);
 
 // function connect() {
 //     socket.connect();
@@ -138,6 +134,7 @@ peer.on("call", (call) => {
 
 socket.on("user-connected", (userId) => {
     console.log("USER-connected", userId, stream.value);
+    clients.set(userId, { peerId: userId })
     addToast({ message: `${userId} entrou na reunião`})
     connectToNewUser(userId, stream.value);
 });
@@ -145,6 +142,7 @@ socket.on("user-connected", (userId) => {
 socket.on("user-disconnected", (userId) => {
     console.log(userId, "disconnected");
     console.log(peers);
+    clients.delete(userId)
     addToast({ message: `${userId} saiu da reunião`})
     // if(peers[userId]) {
     peers[userId].close();
@@ -155,8 +153,8 @@ socket.on("user-disconnected", (userId) => {
 
 const userId = ref<string>('')
 
-peer.on("open", (id) => {
-    userId.value = id
+peer.on("open", (peerId) => {
+    userId.value = peerId
     console.log("peer connection opened", userId.value);
     joinRoom(userId)
 });

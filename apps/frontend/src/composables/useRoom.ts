@@ -3,7 +3,7 @@ import { state, socket } from "../config/socket";
 import { toValue } from "@vueuse/core";
 
 interface User {
-    id: string,
+    peerId: string,
 }
 
 export function useRoom(id: MaybeRefOrGetter<string>) {
@@ -17,11 +17,11 @@ export function useRoom(id: MaybeRefOrGetter<string>) {
         const uId = toValue(userId)
         console.log('[useRoom] join-meeting', rId.value, uId)
         socket.emit("join-meeting", rId.value, uId);
-        clients.set(uId, { id: uId })
+        clients.set(uId, { peerId: uId })
     }
 
-    function leaveRoom(userId: MaybeRefOrGetter<string>) {
-        const uId = toValue(userId)
+    function leaveRoom(peerId: MaybeRefOrGetter<string>) {
+        const uId = toValue(peerId)
         console.log('[useRoom] leave-meeting', rId.value, uId)
         socket.emit("leave-meeting", rId.value, uId);
         clients.delete(uId)
