@@ -1,5 +1,6 @@
 import { MaybeRefOrGetter, reactive, toRef } from "vue"
 import { state, socket } from "../config/socket";
+import { toValue } from "@vueuse/core";
 
 interface User {
     id: string,
@@ -12,16 +13,17 @@ export function useRoom(id: MaybeRefOrGetter<string>) {
 
     const clients = reactive(new Map<string, User>())
 
-    function join(roomId: string, userId: string) {
-        console.log('[useRoom] JOIN ROOM', roomId, userId)
-        socket.emit("join-room", roomId, userId);
-        clients.set(userId, { id: userId })
+    function joinRoom(userId: MaybeRefOrGetter<string>) {
+        const uId = toValue(userId)
+        console.log('[useRoom] JOIN ROOM', rId.value, uId)
+        socket.emit("join-room", rId.value, uId);
+        clients.set(uId, { id: uId })
     }
 
     return {
         rId,
         clients,
-        join,
+        joinRoom,
         // deprecated
         state, socket,
     }

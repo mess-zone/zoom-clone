@@ -96,7 +96,7 @@ import SettingsModal from "../components/organisms/SettingsModal.vue";
 
 const route = useRoute();
 
-const { rId: roomId, clients, join, state, socket } = useRoom(''+route.params.roomId)
+const { rId: roomId, clients, joinRoom, state, socket } = useRoom(''+route.params.roomId)
 
 const connected = computed(() => state.connected);
 const users = computed(() => state.users);
@@ -152,7 +152,7 @@ socket.on("user-disconnected", (userId) => {
 
 peer.on("open", (id) => {
     console.log("peer connection opened", id);
-    join(roomId.value, id)
+    joinRoom(id)
 });
 
 
