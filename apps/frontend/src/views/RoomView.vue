@@ -80,14 +80,12 @@
 <script setup lang="ts">
 import { computed, ref, toRefs } from "vue";
 import { useRoute } from "vue-router";
-// import { useRoom } from '../composables/useRoom'
 import { useRoomStore } from '../stores/useRoomStore'
 import { useToasts } from '../composables/useToasts'
 import { useLocalStream } from '../composables/useLocalStream'
 
 import { Peer } from "peerjs";
 
-import router from "../routes";
 import SettingsModal from "../components/organisms/SettingsModal.vue";
 import ToastContainer from "../components/molecules/ToastContainer.vue";
 
@@ -99,7 +97,7 @@ const { room } = useRoomStore()
 const { rId: roomId, clients, state } = toRefs(room)
 
 room.setRoomId(''+route.params.roomId)
-// const { rId: roomId, clients, joinRoom, leaveRoom, state, socket } = useRoom(''+route.params.roomId)
+room.active = true
 
 const connected = computed(() => state.value.connected);
 const size = computed(() => clients.value.size);
@@ -196,11 +194,10 @@ function closeSettingsModal() {
     settingsModalIsOpen.value = false
 }
 
+// TODO reset room when leaving?
 function handleLeaveRoom() {
     room.leaveRoom(userId)
-    router.push({
-        name: 'home'
-    })
+    room.active = false
 }
 </script>
 

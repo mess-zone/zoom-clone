@@ -10,12 +10,9 @@ export function useRoom() {
     // TODO rename to roomId
     const rId = ref<string>()
 
-    const clients = reactive(new Map<string, User>())
+    const active = ref(false)
 
-    // if(!rId.value) {
-    //     // gerar novo id
-    //     createRandomRoomId()
-    // }
+    const clients = reactive(new Map<string, User>())
 
     /**
      * configura socket para acessar a sala com id especificado.
@@ -73,6 +70,7 @@ export function useRoom() {
 
     return {
         rId,
+        active,
         clients,
         joinRoom,
         leaveRoom,
