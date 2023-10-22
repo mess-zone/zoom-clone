@@ -99,14 +99,6 @@ const { rId: roomId, clients, joinRoom, leaveRoom, state, socket } = useRoom(''+
 const connected = computed(() => state.connected);
 const size = computed(() => clients.size);
 
-// function connect() {
-//     socket.connect();
-// }
-
-// function disconnect() {
-//     socket.disconnect();
-// }
-
 const video = ref<HTMLVideoElement>();
 
 const { 
@@ -201,7 +193,6 @@ function closeSettingsModal() {
 
 function handleLeaveRoom() {
     leaveRoom(userId)
-    // disconnect()
     router.push({
         name: 'home'
     })
@@ -271,7 +262,6 @@ function handleLeaveRoom() {
 .no-camera {
     position: absolute;
     inset: 0;
-    /* background-color: rgba(0, 9, 128, 0.459); */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -282,7 +272,6 @@ function handleLeaveRoom() {
     height: 50px;
     aspect-ratio: 1;
     border-radius: 50%;
-    /* background-color: green; */
     border-color: rgba(255, 255, 255, 0.356);
     border-style: solid;
 }
