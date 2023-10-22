@@ -140,12 +140,14 @@ peer.on("call", (call) => {
 
 socket.on("user-connected", (userId) => {
     console.log("USER-connected", userId, stream.value);
+    addToast({ message: `${userId} entrou na reunião`})
     connectToNewUser(userId, stream.value);
 });
 
 socket.on("user-disconnected", (userId) => {
     console.log(userId, "disconnected");
     console.log(peers);
+    addToast({ message: `${userId} saiu da reunião`})
     // if(peers[userId]) {
     peers[userId].close();
     // }
@@ -159,18 +161,6 @@ peer.on("open", (id) => {
     userId.value = id
     console.log("peer connection opened", userId.value);
     joinRoom(userId)
-
-    setTimeout(()=> {
-        addToast({ message: '1  3f063f3c-5bc5-467b-8fe2-19ab9eb483a0 entrou na reunião'})
-    }, 1000)
-
-    setTimeout(()=> {
-        addToast({ message: '2  3f063f3c-5bc5-467b-8fe2-19ab9eb483a0 entrou na reunião'})
-    }, 2000)
-
-    setTimeout(()=> {
-        addToast({ message: '3  3f063f3c-5bc5-467b-8fe2-19ab9eb483a0 entrou na reunião'})
-    }, 4000)
 });
 
 
