@@ -25,10 +25,6 @@
             </div>
         </div>
         <p>socket connected: {{ connected }}</p>
-        <!-- <button @click="joinRoom()">join-room</button>
-        <br />
-        <button @click="connect()">Connect</button>
-        <button @click="disconnect()">Disconnect</button> -->
         <pre>
             {{ users }}
         </pre>

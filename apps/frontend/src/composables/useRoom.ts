@@ -15,15 +15,15 @@ export function useRoom(id: MaybeRefOrGetter<string>) {
 
     function joinRoom(userId: MaybeRefOrGetter<string>) {
         const uId = toValue(userId)
-        console.log('[useRoom] JOIN ROOM', rId.value, uId)
-        socket.emit("join-room", rId.value, uId);
+        console.log('[useRoom] join-meeting', rId.value, uId)
+        socket.emit("join-meeting", rId.value, uId);
         clients.set(uId, { id: uId })
     }
 
     function leaveRoom(userId: MaybeRefOrGetter<string>) {
         const uId = toValue(userId)
-        console.log('[useRoom] LEAVE ROOM', rId.value, uId)
-        socket.emit("leave-room", rId.value, uId);
+        console.log('[useRoom] leave-meeting', rId.value, uId)
+        socket.emit("leave-meeting", rId.value, uId);
         clients.delete(uId)
     }
 

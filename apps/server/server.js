@@ -63,9 +63,9 @@ function leaveUser(roomId, socketId) {
 }
 
 io.on('connection', socket => {
-    // TODO rename to join-meeting
-    socket.on('join-room', (roomId, userId) => {
-        console.log('[join-room]', socket.id, roomId, userId)
+    
+    socket.on('join-meeting', (roomId, userId) => {
+        console.log('[join-meeting]', socket.id, roomId, userId)
         socket.join(roomId)
         joinUser({
             roomId: roomId,
@@ -82,9 +82,8 @@ io.on('connection', socket => {
         })
     })
 
-    // TODO rename to leave-meeting
-    socket.on('leave-room', (roomId, userId) => {
-        console.log('[leave-room]', roomId, userId)
+    socket.on('leave-meeting', (roomId, userId) => {
+        console.log('[leave-meeting]', roomId, userId)
         socket.leave(roomId)
         // socket.to(roomId).emit('user-disconnected', userId)
     })
