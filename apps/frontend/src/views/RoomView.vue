@@ -24,7 +24,6 @@
                 </div>
             </div>
         </div>
-        <p>socket connected: {{ connected }}</p>
         <pre>
             {{ users }}
         </pre>
@@ -32,7 +31,10 @@
         <div class="footer-bar">
             <ToastContainer class="bottom-toast-container" />
       
-            <h4>{{ roomId }}</h4>
+            <div class="room-name">
+                <span class="connection-status-dot" :class="{ 'connected': connected }" :title="connected ? 'Connected': 'Disconnected'"></span>
+                <h4>{{ roomId }}</h4>
+            </div>
             <div class="center">
                 <button
                     class="btn-round"
@@ -313,6 +315,24 @@ function handleLeaveRoom() {
     left: 0;
     width: 100%;
     margin: 10px 20px;
+}
+
+.connection-status-dot {
+    display: block;
+    width: 10px;
+    aspect-ratio: 1;
+    background-color: rgb(255, 0, 0);
+    border-radius: 50%;
+}
+
+.connection-status-dot.connected {
+    background-color: #2ae52a;
+}
+
+.room-name {
+    display: flex;
+    gap: 8px;
+    align-items: center;
 }
 
 </style>

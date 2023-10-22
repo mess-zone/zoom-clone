@@ -20,7 +20,11 @@ socket.on("connect", () => {
 
 socket.on("disconnect", () => {
   state.connected = false;
+  console.log('socket connected')
 });
+
+
+
 
 // TODO rename to user-joined-room
 socket.on('user-connected', (userId) => {
