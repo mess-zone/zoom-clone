@@ -32,11 +32,36 @@ app.get('/api/room', (req, res) => {
 //     res.render('room', { roomId: req.params.room })
 // })
 
+const rooms = new Map()
+
+function createRoom(id) {
+    rooms.set(id, [])
+    console.log(rooms)
+}
+
+function deleteRoom(id) {
+    rooms.delete(id)
+    console.log(rooms)
+}
+
+/**
+ * 
+ * user: { roomId: string, socketId: string, peerId: string } 
+ */
+function joinUser(user) {
+    rooms.get(user.roomId).push(user)
+    console.log(rooms)
+}
 
 io.on('connection', socket => {
     socket.on('join-room', (roomId, userId) => {
-        console.log('join-room', roomId, userId)
+        console.log('join-room', socket.id, roomId, userId)
         socket.join(roomId)
+        joinUser({
+            roomId: roomId,
+            socketId: socket.id,
+            peerId: userId,
+        })
         socket.to(roomId).emit('user-connected', userId)
 
         socket.on('disconnect', () => {
@@ -50,14 +75,27 @@ io.on('connection', socket => {
         socket.leave(roomId)
         socket.to(roomId).emit('user-disconnected', userId)
     })
+
+
+    io.of("/").adapter.on("join-room", (room, id) => {
+        if(room === id) return // ignora global room events
+        console.log(`!!! socket ${id} has joined room ${room}`);
+    });
+    
+    io.of("/").adapter.on("leave-room", (room, id) => {
+        if(room === id) return // ignore global room events
+        console.log(`!! socket ${id} has leaved room ${room}`);
+    });
 })
 
-io.of("/").adapter.on("join-room", (room, id) => {
-    console.log(`!!! socket ${id} has joined room ${room}`);
+io.of("/").adapter.on("create-room", (room) => {
+    console.log(`#### created room ${room}`);
+    createRoom(room)
 });
 
-io.of("/").adapter.on("leave-room", (room, id) => {
-    console.log(`!! socket ${id} has leaved room ${room}`);
+io.of("/").adapter.on("delete-room", (room) => {
+    console.log(`#### deleted room ${room}`);
+    deleteRoom(room)
 });
 
 server.listen(3000, () => {
