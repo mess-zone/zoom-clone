@@ -11,6 +11,18 @@
                         :style="{ borderWidth: soundLevel + 'px' }"
                     ></div>
                 </div>
+                <div class="status-bar">
+                    <div class="mic-status">
+                        <font-awesome-icon
+                            v-show="micIsEnabled"
+                            icon="fa-solid fa-microphone"
+                        />
+                        <font-awesome-icon
+                            v-show="!micIsEnabled"
+                            icon="fa-solid fa-microphone-slash"
+                        />
+                    </div>
+                </div>
             </div>
         </div>
         <p>socket connected: {{ connected }}</p>
@@ -250,6 +262,21 @@ function handleLeaveRoom() {
     object-fit: cover;
 }
 
+.video-wrapper .status-bar {
+    background-color: rgba(0, 0, 0, 0.6);
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 8px;
+}
+
+.status-bar .mic-status {
+    width: 32px;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 .btn-round {
     width: 48px;
