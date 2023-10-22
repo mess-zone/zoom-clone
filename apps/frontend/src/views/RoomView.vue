@@ -103,9 +103,9 @@ const users = computed(() => state.users);
 //     socket.connect();
 // }
 
-function disconnect() {
-    socket.disconnect();
-}
+// function disconnect() {
+//     socket.disconnect();
+// }
 
 const video = ref<HTMLVideoElement>();
 
@@ -196,9 +196,8 @@ function closeSettingsModal() {
 }
 
 function handleLeaveRoom() {
-    console.log('leave room')
     leaveRoom(userId)
-    disconnect()
+    // disconnect()
     router.push({
         name: 'home'
     })
