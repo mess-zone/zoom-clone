@@ -10,11 +10,12 @@ export const state = reactive({
 });
 
 const URL: string = import.meta.env.VITE_SERVER_URL
-console.log('SERVER URL', URL)
 export const socket = io(URL);
+console.log('SERVER URL', URL)
 
 socket.on("connect", () => {
   state.connected = true;
+  console.log('socket connected')
 });
 
 socket.on("disconnect", () => {

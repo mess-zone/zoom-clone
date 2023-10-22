@@ -85,7 +85,6 @@
 </template>
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { state, socket } from "../config/socket";
 import { useRoute } from "vue-router";
 import { useRoom } from '../composables/useRoom'
 import { useLocalStream } from '../composables/useLocalStream'
@@ -96,6 +95,8 @@ import router from "../routes";
 import SettingsModal from "../components/organisms/SettingsModal.vue";
 
 const route = useRoute();
+
+const { rId: roomId, clients, join, state, socket } = useRoom(''+route.params.roomId)
 
 const connected = computed(() => state.connected);
 const users = computed(() => state.users);
@@ -118,42 +119,6 @@ const {
     muteMic,
     soundLevel,
 } = useLocalStream(video)
-
-
-// const soundLevel = ref(0);
-// watch(stream, () => {
-//     if (stream.value) {
-//         console.log("STREAM CHANGED", stream);
-
-//         // draw microphone activity levels
-//         const audioContext = new AudioContext();
-//         const analyser = audioContext.createAnalyser();
-//         const microphone = audioContext.createMediaStreamSource(stream.value);
-//         const javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
-
-//         analyser.smoothingTimeConstant = 0.3;
-//         analyser.fftSize = 1024;
-
-//         microphone.connect(analyser);
-//         analyser.connect(javascriptNode);
-//         javascriptNode.connect(audioContext.destination);
-
-//         javascriptNode.onaudioprocess = throttle(() => {
-//             var array = new Uint8Array(analyser.frequencyBinCount);
-//             analyser.getByteFrequencyData(array);
-//             var values = 0;
-
-//             var length = array.length;
-//             for (var i = 0; i < length; i++) {
-//                 values += array[i];
-//             }
-
-//             var average = values / length;
-//             // console.log(average)
-//             soundLevel.value = average;
-//         }, 150);
-//     }
-// });
 
 //p2p
 const peer = new Peer();
@@ -183,11 +148,11 @@ socket.on("user-disconnected", (userId) => {
 });
 
 
-const { rId: roomId } = useRoom(''+route.params.roomId)
+
 
 peer.on("open", (id) => {
     console.log("peer connection opened", id);
-    socket.emit("join-room", roomId.value, id);
+    join(roomId.value, id)
 });
 
 
