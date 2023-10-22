@@ -74,9 +74,9 @@
 import { computed, ref, watch, watchEffect } from "vue";
 import { state, socket } from "../config/socket";
 import { useRoute } from "vue-router";
-import { useRoom } from '../composables/use-room'
+import { useRoom } from '../composables/useRoom'
 // import { useStream } from '../composables/use-stream'
-import { useDevices } from '../composables/use-devices'
+import { useDevices } from '../composables/useDevices'
 
 import { useUserMedia } from "@vueuse/core";
 

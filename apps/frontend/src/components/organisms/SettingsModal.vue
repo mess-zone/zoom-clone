@@ -42,7 +42,7 @@
     </Modal>
 </template>
 <script setup lang="ts">
-import { useDevices } from "../../composables/use-devices";
+import { useDevices } from "../../composables/useDevices";
 import Modal from "../molecules/Modal.vue";
 
 const emit = defineEmits(['close'])
