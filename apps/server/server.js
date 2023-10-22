@@ -63,29 +63,37 @@ function leaveUser(roomId, socketId) {
 }
 
 io.on('connection', socket => {
+    // TODO rename to join-meeting
     socket.on('join-room', (roomId, userId) => {
-        console.log('join-room', socket.id, roomId, userId)
+        console.log('[join-room]', socket.id, roomId, userId)
         socket.join(roomId)
         joinUser({
             roomId: roomId,
             socketId: socket.id,
             peerId: userId,
         })
+
+        // TODO rename to joined-meeting
         socket.to(roomId).emit('user-connected', userId)
 
         socket.on('disconnect', () => {
-            console.log('disconnect', roomId, userId)
+            console.log('### disconnect', roomId, userId)
             // socket.to(roomId).emit('user-disconnected', userId)
         })
     })
 
+    // TODO rename to leave-meeting
     socket.on('leave-room', (roomId, userId) => {
-        console.log('leave-room', roomId, userId)
+        console.log('[leave-room]', roomId, userId)
         socket.leave(roomId)
         // socket.to(roomId).emit('user-disconnected', userId)
     })
 
 })
+
+/**
+ * Room internal events
+ */
 
 io.of("/").adapter.on("create-room", (roomId) => {
     console.log(`#### created room ${roomId}`);
@@ -107,6 +115,8 @@ io.of("/").adapter.on("leave-room", (roomId, socketId) => {
     console.log(`!!! socket ${socketId} has leaved room ${roomId}`);
     const user = {...getUser(roomId, socketId)} // shallow copy
     leaveUser(roomId, socketId)
+
+    // TODO rename to leaved-meeting
     io.to(roomId).emit('user-disconnected', user.peerId)
 });
 
