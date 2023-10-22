@@ -1,17 +1,34 @@
-import { MaybeRefOrGetter, reactive, toRef } from "vue"
+import { MaybeRefOrGetter, reactive, ref, toValue } from "vue"
 import { state, socket } from "../config/socket";
-import { toValue } from "@vueuse/core";
 
 interface User {
     peerId: string,
 }
 
-export function useRoom(id: MaybeRefOrGetter<string>) {
+export function useRoom(id?: MaybeRefOrGetter<string>) {
 
     // TODO rename to roomId
-    const rId = toRef(id)
+    const rId = ref(toValue(id))
 
     const clients = reactive(new Map<string, User>())
+
+    // entrar em sala com id definido
+    if(!rId.value) {
+        // gerar novo id
+        createRoom()
+    }
+
+    async function createRoom() {
+        try {
+            const response = await socket.emitWithAck('create-meeting')
+            console.log('ROOM ID NOT DEFINED, CREATING MEETING ID', response)
+    
+            rId.value = response.roomId
+
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     async function joinRoom(userId: MaybeRefOrGetter<string>) {
         const uId = toValue(userId)
