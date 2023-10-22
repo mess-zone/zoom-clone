@@ -75,10 +75,7 @@ import { computed, ref, watch, watchEffect } from "vue";
 import { state, socket } from "../config/socket";
 import { useRoute } from "vue-router";
 import { useRoom } from '../composables/useRoom'
-// import { useStream } from '../composables/use-stream'
-import { useDevices } from '../composables/useDevices'
-
-import { useUserMedia } from "@vueuse/core";
+import { useLocalStream } from '../composables/useLocalStream'
 
 import { Peer } from "peerjs";
 import throttle from "lodash.throttle";
@@ -98,23 +95,10 @@ function disconnect() {
     socket.disconnect();
 }
 
-// const { localStream } = useStream()
-
-const { 
-    currentCamera, 
-    currentMicrophone
-} = useDevices()
-
 const video = ref<HTMLVideoElement>();
-const { stream, enabled, constraints, restart } = useUserMedia({
-    autoSwitch: true,
-    constraints: {
-        // @ts-ignore
-        video: { deviceId: currentCamera },
-        // @ts-ignore
-        audio: { deviceId: currentMicrophone },
-    },
-});
+
+const { stream } = useLocalStream(video)
+
 
 const soundLevel = ref(0);
 watch(stream, () => {
@@ -151,36 +135,10 @@ watch(stream, () => {
     }
 });
 
-watch(constraints, () => {
-    console.log("STREAM CONSTRAINS CHANGED", constraints);
-});
-
-watch(currentCamera, () => {
-    console.log("current camera CHANGED", currentCamera);
-    restart();
-});
-
-watch(currentMicrophone, () => {
-    console.log("currentMicrophone CHANGED", currentMicrophone);
-    restart();
-});
-
-enabled.value = true;
-
 //p2p
 const peer = new Peer();
 
 const peers = {};
-
-watchEffect(() => {
-    console.log("WATCH EFFECT", stream.value);
-    if (video.value) {
-        video.value.srcObject = stream.value!;
-        // video.value.addEventListener('loadedmetadata', () => {
-        //     video.value?.play()
-        // })
-    }
-});
 
 peer.on("call", (call) => {
     call.answer(stream.value);
