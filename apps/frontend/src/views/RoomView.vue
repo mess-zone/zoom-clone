@@ -197,7 +197,7 @@ function closeSettingsModal() {
 
 function handleLeaveRoom() {
     console.log('leave room')
-    leaveRoom()
+    leaveRoom(userId)
     disconnect()
     router.push({
         name: 'home'

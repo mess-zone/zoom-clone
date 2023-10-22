@@ -20,10 +20,18 @@ export function useRoom(id: MaybeRefOrGetter<string>) {
         clients.set(uId, { id: uId })
     }
 
+    function leaveRoom(userId: MaybeRefOrGetter<string>) {
+        const uId = toValue(userId)
+        console.log('[useRoom] LEAVE ROOM', rId.value, uId)
+        socket.emit("leave-room", rId.value, uId);
+        clients.delete(uId)
+    }
+
     return {
         rId,
         clients,
         joinRoom,
+        leaveRoom,
         // deprecated
         state, socket,
     }
