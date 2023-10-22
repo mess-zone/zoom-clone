@@ -1,7 +1,7 @@
 <template>
     <Modal :isOpen="props.isOpen" @close="close" >
         <template v-slot:title>
-            Settings Modal
+            Settings
         </template>
         <div class="config-group">
             <h3>Video</h3>
