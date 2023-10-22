@@ -1,9 +1,9 @@
 <template>
-        <div v-if="props.isOpen" class="modal-overlay" @click="closeSettingsModal">
+        <div v-if="props.isOpen" class="modal-overlay" @click="close">
             <div class="modal" @click.stop="">
                 <div class="modal-header">
-                    <h2>Settings Component</h2>
-                    <button class="close-icon" @click="closeSettingsModal">
+                    <h2><slot name="title">Title</slot></h2>
+                    <button class="close-icon" @click="close">
                         <font-awesome-icon icon="fa-solid fa-xmark" />
                     </button>
                 </div>
@@ -24,7 +24,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
-function closeSettingsModal() {
+function close() {
     emit('close')
 }
 
@@ -69,7 +69,7 @@ function closeSettingsModal() {
     align-items: flex-start;
     margin-bottom: 15px;
 }
-
+/* 
 .config-group {
     border-top: 1px solid rgba(0, 0, 0, 0.1);
     padding: 15px 0;
@@ -93,5 +93,5 @@ function closeSettingsModal() {
 .select-list li.active {
     color: green;
     font-weight: bold;
-}
+} */
 </style>

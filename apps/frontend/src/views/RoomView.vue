@@ -66,7 +66,10 @@
         </div>
 
         <Teleport to="body">
-            <ModalSettings :isOpen="settingsModalIsOpen" @close="closeSettingsModal" >
+            <Modal :isOpen="settingsModalIsOpen" @close="closeSettingsModal" >
+                <template v-slot:title>
+                    Settings
+                </template>
                 <div class="config-group">
                     <h3>Video</h3>
                     <h4>Camera</h4>
@@ -103,7 +106,7 @@
                         </li>
                     </ul>
                 </div>
-            </ModalSettings>
+            </Modal>
         </Teleport>
     </div>
 </template>
@@ -120,7 +123,7 @@ import { useUserMedia } from "@vueuse/core";
 import { Peer } from "peerjs";
 import throttle from "lodash.throttle";
 import router from "../routes";
-import ModalSettings from "../components/ModalSettings.vue";
+import Modal from "../components/Modal.vue";
 
 const route = useRoute();
 
