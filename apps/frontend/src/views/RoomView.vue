@@ -34,11 +34,7 @@
         </pre>
 
         <div class="footer-bar">
-            <TransitionGroup name="list" tag="div" class="toast-container">
-                <div class="toast" v-for="toast in toasts" :key="toast.id">
-                   {{ toast.id }} {{ toast.message }}
-                </div>
-            </TransitionGroup>
+            <ToastContainer class="bottom-toast-container" />
       
             <h4>{{ roomId }}</h4>
             <div class="center">
@@ -98,10 +94,11 @@ import { Peer } from "peerjs";
 
 import router from "../routes";
 import SettingsModal from "../components/organisms/SettingsModal.vue";
+import ToastContainer from "../components/molecules/ToastContainer.vue";
 
 const route = useRoute();
 
-const { toasts, addToast } = useToasts()
+const { addToast } = useToasts()
 
 const { rId: roomId, clients, joinRoom, leaveRoom, state, socket } = useRoom(''+route.params.roomId)
 
@@ -162,7 +159,18 @@ peer.on("open", (id) => {
     userId.value = id
     console.log("peer connection opened", userId.value);
     joinRoom(userId)
-    // addToast({ message: 'Você entrou na reunião' })
+
+    setTimeout(()=> {
+        addToast({ message: '1  3f063f3c-5bc5-467b-8fe2-19ab9eb483a0 entrou na reunião'})
+    }, 1000)
+
+    setTimeout(()=> {
+        addToast({ message: '2  3f063f3c-5bc5-467b-8fe2-19ab9eb483a0 entrou na reunião'})
+    }, 2000)
+
+    setTimeout(()=> {
+        addToast({ message: '3  3f063f3c-5bc5-467b-8fe2-19ab9eb483a0 entrou na reunião'})
+    }, 4000)
 });
 
 
@@ -313,43 +321,12 @@ function handleLeaveRoom() {
     gap: 10px;
 }
 
-.footer-bar .toast-container {
+.footer-bar .bottom-toast-container {
     position: absolute;
     bottom: 100%;
     left: 0;
     width: 100%;
-    margin: 10px 0;
-}
-
-.toast {
-    display: inline-block;
-    background-color: rgb(53, 56, 60);
-    color: rgb(167, 169, 172);
-    padding: 15px 20px;
-    border-radius: 5px;
-    font-size: .8em;
-    font-weight: bold;
     margin: 10px 20px;
-}
-
-/**
-Toast transitions
-*/
-
-.list-move, /* apply transition to moving elements */
-.list-enter-active,
-.list-leave-active {
-  transition: all 0.5s ease;
-}
-
-.list-enter-from {
-  opacity: 0;
-  transform: translateY(30px);
-}
-
-.list-leave-to {
-  opacity: 0;
-  transform: translateY(-30px);
 }
 
 </style>
