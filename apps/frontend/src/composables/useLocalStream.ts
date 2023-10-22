@@ -1,4 +1,4 @@
-import { MaybeRefOrGetter, toRef, watch, watchEffect } from "vue";
+import { MaybeRefOrGetter, ref, toRef, watch, watchEffect } from "vue";
 import { useDevices } from "./useDevices";
 import { useUserMedia } from "@vueuse/core";
 
@@ -44,7 +44,36 @@ export function useLocalStream(element: MaybeRefOrGetter<HTMLVideoElement | unde
         }
     });
 
+
+
+    const camIsEnabled = ref(false);
+    const micIsEnabled = ref(false);
+
+    watchEffect(() => {
+        if (stream.value) {
+            camIsEnabled.value = stream.value.getVideoTracks()[0].enabled;
+            micIsEnabled.value = stream.value.getAudioTracks()[0].enabled;
+        }
+    });
+
+    function muteCam() {
+        camIsEnabled.value = !camIsEnabled.value;
+        // @ts-ignore
+        stream.value
+            .getVideoTracks()
+            .forEach((track) => (track.enabled = camIsEnabled.value));
+    }
+
+    function muteMic() {
+        micIsEnabled.value = !micIsEnabled.value;
+        // @ts-ignore
+        stream.value
+            .getAudioTracks()
+            .forEach((track) => (track.enabled = micIsEnabled.value));
+    }
+
     return {
         videoEl, stream, enabled, start, stop, restart,
+        camIsEnabled, micIsEnabled, muteCam, muteMic, 
     }
 }

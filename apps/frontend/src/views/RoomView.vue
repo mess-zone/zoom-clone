@@ -71,7 +71,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { computed, ref, watch, watchEffect } from "vue";
+import { computed, ref, watch } from "vue";
 import { state, socket } from "../config/socket";
 import { useRoute } from "vue-router";
 import { useRoom } from '../composables/useRoom'
@@ -97,7 +97,13 @@ function disconnect() {
 
 const video = ref<HTMLVideoElement>();
 
-const { stream } = useLocalStream(video)
+const { 
+    stream, 
+    camIsEnabled, 
+    micIsEnabled, 
+    muteCam, 
+    muteMic
+} = useLocalStream(video)
 
 
 const soundLevel = ref(0);
@@ -199,39 +205,6 @@ function addVideoStream(video, stream) {
         videoGrid.value.append(video);
     }
 }
-
-const camIsEnabled = ref(false);
-const micIsEnabled = ref(false);
-
-watchEffect(() => {
-    if (stream.value) {
-        camIsEnabled.value = stream.value.getVideoTracks()[0].enabled;
-        micIsEnabled.value = stream.value.getAudioTracks()[0].enabled;
-        console.log("BUTTONS watchers", camIsEnabled.value, micIsEnabled.value);
-    }
-});
-
-function muteCam() {
-    camIsEnabled.value = !camIsEnabled.value;
-    // @ts-ignore
-    stream.value
-        .getVideoTracks()
-        .forEach((track) => (track.enabled = camIsEnabled.value));
-    // @ts-ignore
-    console.log("mute cam", stream.value.getVideoTracks()[0]);
-}
-
-function muteMic() {
-    micIsEnabled.value = !micIsEnabled.value;
-
-    // @ts-ignore
-    stream.value
-        .getAudioTracks()
-        .forEach((track) => (track.enabled = micIsEnabled.value));
-    // @ts-ignore
-    console.log("mute mic", stream.value.getAudioTracks()[0]);
-}
-
 
 const settingsModalIsOpen = ref(false)
 
