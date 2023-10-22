@@ -1,7 +1,5 @@
 <template>
     <div class="page">
-
-
         <div ref="videoGrid" id="videoGrid">
             <div class="video-wrapper my-video">
                 <video ref="video" autoplay muted></video>
@@ -96,7 +94,7 @@ import SettingsModal from "../components/organisms/SettingsModal.vue";
 
 const route = useRoute();
 
-const { rId: roomId, clients, joinRoom, state, socket } = useRoom(''+route.params.roomId)
+const { rId: roomId, clients, joinRoom, leaveRoom, state, socket } = useRoom(''+route.params.roomId)
 
 const connected = computed(() => state.connected);
 const users = computed(() => state.users);
@@ -149,10 +147,12 @@ socket.on("user-disconnected", (userId) => {
 
 
 
+const userId = ref<string>('')
 
 peer.on("open", (id) => {
-    console.log("peer connection opened", id);
-    joinRoom(id)
+    userId.value = id
+    console.log("peer connection opened", userId.value);
+    joinRoom(userId)
 });
 
 
@@ -197,6 +197,7 @@ function closeSettingsModal() {
 
 function handleLeaveRoom() {
     console.log('leave room')
+    leaveRoom()
     disconnect()
     router.push({
         name: 'home'
