@@ -12,6 +12,7 @@
                     ></div>
                 </div>
                 <div class="status-bar">
+                    {{ soundLevel }}
                     <div class="mic-status">
                         <font-awesome-icon
                             v-show="micIsEnabled"
@@ -83,14 +84,14 @@
     </div>
 </template>
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import { state, socket } from "../config/socket";
 import { useRoute } from "vue-router";
 import { useRoom } from '../composables/useRoom'
 import { useLocalStream } from '../composables/useLocalStream'
 
 import { Peer } from "peerjs";
-import throttle from "lodash.throttle";
+
 import router from "../routes";
 import SettingsModal from "../components/organisms/SettingsModal.vue";
 
@@ -114,44 +115,45 @@ const {
     camIsEnabled, 
     micIsEnabled, 
     muteCam, 
-    muteMic
+    muteMic,
+    soundLevel,
 } = useLocalStream(video)
 
 
-const soundLevel = ref(0);
-watch(stream, () => {
-    if (stream.value) {
-        console.log("STREAM CHANGED", stream);
+// const soundLevel = ref(0);
+// watch(stream, () => {
+//     if (stream.value) {
+//         console.log("STREAM CHANGED", stream);
 
-        // draw microphone activity levels
-        const audioContext = new AudioContext();
-        const analyser = audioContext.createAnalyser();
-        const microphone = audioContext.createMediaStreamSource(stream.value);
-        const javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
+//         // draw microphone activity levels
+//         const audioContext = new AudioContext();
+//         const analyser = audioContext.createAnalyser();
+//         const microphone = audioContext.createMediaStreamSource(stream.value);
+//         const javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
 
-        analyser.smoothingTimeConstant = 0.3;
-        analyser.fftSize = 1024;
+//         analyser.smoothingTimeConstant = 0.3;
+//         analyser.fftSize = 1024;
 
-        microphone.connect(analyser);
-        analyser.connect(javascriptNode);
-        javascriptNode.connect(audioContext.destination);
+//         microphone.connect(analyser);
+//         analyser.connect(javascriptNode);
+//         javascriptNode.connect(audioContext.destination);
 
-        javascriptNode.onaudioprocess = throttle(() => {
-            var array = new Uint8Array(analyser.frequencyBinCount);
-            analyser.getByteFrequencyData(array);
-            var values = 0;
+//         javascriptNode.onaudioprocess = throttle(() => {
+//             var array = new Uint8Array(analyser.frequencyBinCount);
+//             analyser.getByteFrequencyData(array);
+//             var values = 0;
 
-            var length = array.length;
-            for (var i = 0; i < length; i++) {
-                values += array[i];
-            }
+//             var length = array.length;
+//             for (var i = 0; i < length; i++) {
+//                 values += array[i];
+//             }
 
-            var average = values / length;
-            // console.log(average)
-            soundLevel.value = average;
-        }, 150);
-    }
-});
+//             var average = values / length;
+//             // console.log(average)
+//             soundLevel.value = average;
+//         }, 150);
+//     }
+// });
 
 //p2p
 const peer = new Peer();
@@ -268,11 +270,11 @@ function handleLeaveRoom() {
     top: 0;
     right: 0;
     padding: 8px;
+    color: white;
 }
 
 .status-bar .mic-status {
     width: 32px;
-    color: white;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -300,7 +302,7 @@ function handleLeaveRoom() {
 .no-camera {
     position: absolute;
     inset: 0;
-    background-color: rgba(0, 9, 128, 0.459);
+    /* background-color: rgba(0, 9, 128, 0.459); */
     display: flex;
     justify-content: center;
     align-items: center;
