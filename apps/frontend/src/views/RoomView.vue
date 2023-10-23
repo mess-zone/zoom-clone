@@ -1,38 +1,36 @@
 <template>
     <div class="page">
-        <div ref="streamGrid" id="streamGrid">
-            {{ peerId }}
-            <StreamPreview v-for="item in channels" :key="item.connectionId" :id="item.connectionId">
-                {{ item.connectionId }}
-                id: {{ item.remoteStream?.id }}
-                active: {{ item.remoteStream?.active }}
-            </StreamPreview>
-        </div>
-
-        <div ref="videoGrid" id="videoGrid">
-            <div class="video-wrapper my-video">
-                <video ref="video" autoplay muted></video>
-                <div class="no-camera">
-                    <div
-                        class="sound-level"
-                        :style="{ borderWidth: soundLevel + 'px' }"
-                    ></div>
-                </div>
-                <div class="status-bar">
-                    {{ soundLevel }}
-                    <div class="mic-status">
-                        <font-awesome-icon
-                            v-show="micIsEnabled"
-                            icon="fa-solid fa-microphone"
-                        />
-                        <font-awesome-icon
-                            v-show="!micIsEnabled"
-                            icon="fa-solid fa-microphone-slash"
-                        />
-                    </div>
+        <div class="video-wrapper my-video">
+            <video ref="video" autoplay muted></video>
+            <div class="no-camera">
+                <div
+                    class="sound-level"
+                    :style="{ borderWidth: soundLevel + 'px' }"
+                ></div>
+            </div>
+            <div class="status-bar">
+                {{ soundLevel }}
+                <div class="mic-status">
+                    <font-awesome-icon
+                        v-show="micIsEnabled"
+                        icon="fa-solid fa-microphone"
+                    />
+                    <font-awesome-icon
+                        v-show="!micIsEnabled"
+                        icon="fa-solid fa-microphone-slash"
+                    />
                 </div>
             </div>
         </div>
+
+        <div ref="streamGrid" id="streamGrid">
+            <StreamPreview v-for="item in channels" :key="item.connectionId" :id="item.connectionId" :mediaConnection="(item as MediaConnection)" :remoteStream="item.remoteStream"></StreamPreview>
+        </div>
+
+        <div ref="videoGrid" id="videoGrid">
+        </div>
+
+
         <div class="footer-bar">
             <ToastContainer class="bottom-toast-container" />
       
@@ -97,6 +95,7 @@ import SettingsModal from "../components/organisms/SettingsModal.vue";
 import ToastContainer from "../components/molecules/ToastContainer.vue";
 import StreamPreview from "../components/molecules/StreamPreview.vue";
 import { usePeer } from "../composables/usePeer";
+import { MediaConnection } from "peerjs";
 
 
 const route = useRoute();
@@ -105,10 +104,6 @@ const { addToast } = useToasts()
 
 const { room } = useRoomStore()
 const { rId: roomId, clients, state } = toRefs(room)
-
-const clientsComputed = computed(() => {
-    return Object.fromEntries(clients.value)
-})
 
 room.setRoomId(''+route.params.roomId)
 room.active = true
@@ -129,7 +124,6 @@ const {
 
 //p2p
 const { open, destroy, call, peerId, peer, channels } = usePeer();
-// const peer = new Peer();
 
 const peers = {};
 
