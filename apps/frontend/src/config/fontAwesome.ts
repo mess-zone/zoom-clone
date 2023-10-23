@@ -15,6 +15,10 @@ import {
     faPhone,
 } from "@fortawesome/free-solid-svg-icons";
 
+import {
+    faHand
+} from "@fortawesome/free-regular-svg-icons";
+
 /* add icons to the library */
 library.add(
     faVideo,
@@ -23,7 +27,8 @@ library.add(
     faMicrophoneSlash,
     faEllipsisVertical,
     faXmark,
-    faPhone
+    faPhone,
+    faHand,
 );
 
 

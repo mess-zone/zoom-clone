@@ -65,6 +65,9 @@
                         icon="fa-solid fa-video-slash"
                     />
                 </button>
+                <button class="btn-round" :class="{ 'active': handIsRaised }" @click="handleRaiseHand" :title="handIsRaised ? 'Stop raise hand': 'Raise hand'">
+                    <font-awesome-icon icon="fa-regular fa-hand" />
+                </button>
                 <button class="btn-round" @click="openSettingsModal" title="More options">
                     <font-awesome-icon icon="fa-solid fa-ellipsis-vertical" />
                 </button>
@@ -203,6 +206,12 @@ function handleLeaveRoom() {
     room.leaveRoom(userId)
     room.active = false
 }
+
+const handIsRaised = ref(false)
+
+function handleRaiseHand() {
+    handIsRaised.value = !handIsRaised.value
+}
 </script>
 
 <style scoped>
@@ -268,6 +277,11 @@ function handleLeaveRoom() {
 
 .btn-round.btn-danger {
     background-color: rgb(219, 39, 52);
+}
+
+.btn-round.active {
+    background-color: rgb(162, 187, 247);
+    color: rgb(32, 29, 34);
 }
 
 .no-camera {
@@ -358,4 +372,5 @@ function handleLeaveRoom() {
   object-fit: cover;
 }
 
-</style>../config/peer../utils/randomUser
+
+</style>
