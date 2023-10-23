@@ -84,5 +84,6 @@ export function usePeer() {
         peerId,
         peer,
         channels,
+        _addMediaConnection,
     }
 }

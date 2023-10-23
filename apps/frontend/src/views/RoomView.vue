@@ -123,7 +123,7 @@ const {
 } = useLocalStream(video)
 
 //p2p
-const { open, destroy, call, peerId, peer, channels } = usePeer();
+const { open, destroy, call, peerId, peer, channels, _addMediaConnection } = usePeer();
 
 const peers = {};
 
@@ -144,16 +144,17 @@ if(peer.value) {
     
     // se algum peer me liga, o evento call é acionado
     peer.value.on("call", (mediaConnection) => {
+        _addMediaConnection(mediaConnection)
         // console.log('[peer] atendendo chamada de ?, sending my local stream')
         // console.log(stream.value)
         // console.log(mediaConnection.metadata)
         mediaConnection.answer(stream.value);
     
-        const video = document.createElement("video");
-        mediaConnection.on("stream", (userVideoStream) => {
-            // console.log('[peer] stream remoto recebido ao atender chamada:', userVideoStream)
-            addVideoStream(video, userVideoStream);
-        });
+        // const video = document.createElement("video");
+        // mediaConnection.on("stream", (userVideoStream) => {
+        //     // console.log('[peer] stream remoto recebido ao atender chamada:', userVideoStream)
+        //     addVideoStream(video, userVideoStream);
+        // });
     });
 }
 
@@ -190,43 +191,43 @@ function connectToNewUser(destPeerId, localStream) {
     // console.log(`[peer] calling user ${destPeerId} who joinded room ?, sendig my stream: `, localStream);
     // call destination peer
     const metadata = { foo: `calling user ${destPeerId} who joinded room` }
-    const mediaConnection = call(destPeerId, localStream, metadata);
+    call(destPeerId, localStream, metadata);
 
-    if(mediaConnection) {
-        const video = document.createElement("video");
-        mediaConnection.on("stream", (userVideoStream) => {
-            // console.log('[peer] stream remoto recebido ao ligar para usuário:', userVideoStream)
-            addVideoStream(video, userVideoStream);
-        });
-        mediaConnection.on("error", () => {
-            video.remove();
-        });
-        mediaConnection.on("close", () => {
-            video.remove();
-        });
+    // if(mediaConnection) {
+    //     const video = document.createElement("video");
+    //     mediaConnection.on("stream", (userVideoStream) => {
+    //         // console.log('[peer] stream remoto recebido ao ligar para usuário:', userVideoStream)
+    //         addVideoStream(video, userVideoStream);
+    //     });
+    //     mediaConnection.on("error", () => {
+    //         video.remove();
+    //     });
+    //     mediaConnection.on("close", () => {
+    //         video.remove();
+    //     });
     
     
-        peers[destPeerId] = mediaConnection;
-    }
+    //     peers[destPeerId] = mediaConnection;
+    // }
 }
 
 const videoGrid = ref<HTMLDivElement>();
 
 const streamGrid = ref<HTMLDivElement>();
 
-function addVideoStream(video, stream) {
-    // console.log("ADD VIDEO STREAM", video) 
-    // streamGrid.value?.querySelectorAll('.stream-preview')
-    video.srcObject = stream;
-    video.classList.add('video-remote')
-    video.addEventListener("loadedmetadata", () => {
-        video.play();
-    });
+// function addVideoStream(video, stream) {
+//     // console.log("ADD VIDEO STREAM", video) 
+//     // streamGrid.value?.querySelectorAll('.stream-preview')
+//     video.srcObject = stream;
+//     video.classList.add('video-remote')
+//     video.addEventListener("loadedmetadata", () => {
+//         video.play();
+//     });
 
-    if (videoGrid.value) {
-        videoGrid.value.append(video);
-    }
-}
+//     if (videoGrid.value) {
+//         videoGrid.value.append(video);
+//     }
+// }
 
 const settingsModalIsOpen = ref(false)
 
