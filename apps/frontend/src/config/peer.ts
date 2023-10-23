@@ -1,13 +1,11 @@
 import { Peer } from "peerjs"
-import { reactive } from "vue"
 
+export function makePeer() {
+    const peer = new Peer()
 
-export const peerState = reactive({
-    peerId: '',
-})
+    peer.on("open", (peerId) => {
+        console.log(`[peer] OPEN peerId: ${peerId}`);
+    });
 
-export const peer = new Peer()
-
-peer.on("open", (peerId) => {
-    console.log(`[PEER] conection opened. My peer id: ${peerId}`)
-})
+    return peer
+}
