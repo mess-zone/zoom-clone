@@ -54,9 +54,9 @@ export function usePeer() {
     /*
     Abrir data connection
     */
-    function connect(destPeerId: string) {
+    function connect(destPeerId: string, options: { label?: string, metadata?: Object }) {
         console.log(`[peer] open remote peer ${destPeerId} data connection`);
-        const dataConnection = peer.value?.connect(destPeerId);
+        const dataConnection = peer.value?.connect(destPeerId, options);
         _addDataConnection(dataConnection)
 
         return dataConnection

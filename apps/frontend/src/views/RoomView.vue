@@ -122,7 +122,7 @@ const {
 } = useLocalStream(video)
 
 //p2p
-const { open, destroy, call, peer, channels, _addMediaConnection, _closeAllConnectionsFromUser } = usePeer();
+const { open, destroy, call, connect, peer, channels, _addMediaConnection, _closeAllConnectionsFromUser } = usePeer();
 
 const mediaChannels = computed(() => {
     return channels.value.filter(c => c.type == 'media') as MediaConnection[]
@@ -186,8 +186,9 @@ room.socket.on("user-disconnected", (userId) => {
  * @param localStream 
  */
 function connectToNewUser(destUser, localStream) {
-    // call destination peer
     const users = [destUser, {...user.value}]
+    connect(destUser.peerId, { label: 'stream-controller' })
+    // call destination peer
     call(destUser.peerId, localStream, { users });
 }
 
