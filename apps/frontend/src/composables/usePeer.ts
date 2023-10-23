@@ -27,6 +27,10 @@ export function usePeer() {
             console.error(`[peer] peer error`, e);
         });
         
+        peer.value.on("connection", (dataConnection) => {
+            console.log(`[peer] a new data connection was established from a remote peer`, dataConnection);
+        })
+
         peer.value.on("call", (mediaConnection) => {
             console.log(`[peer] a remote peer attempts to call you`, mediaConnection);
         })
@@ -46,7 +50,7 @@ export function usePeer() {
 
     function _addMediaConnection(mediaConnection: MediaConnection | undefined) {
         if(mediaConnection) {
-            console.log(`[peer] mediaConnection ${mediaConnection.connectionId}`, mediaConnection)
+            console.log(`[peer] mediaConnection ${mediaConnection.connectionId} added`, mediaConnection)
             channels.value.push(mediaConnection)
 
             mediaConnection.on('stream', (stream) => {
