@@ -72,7 +72,7 @@ export function usePeer() {
             })
 
             dataConnection.on('data', (data) => {
-                console.log(`[peer] dataConnection ${dataConnection.connectionId} received data`, data);
+                console.log(`[peer] dataConnection ${dataConnection.connectionId} received data:`, data);
             })
 
             dataConnection.on('close', () => {
@@ -143,6 +143,7 @@ export function usePeer() {
         peer,
         channels,
         _addMediaConnection,
+        _addDataConnection,
         _closeAllConnectionsFromUser,
     }
 }
