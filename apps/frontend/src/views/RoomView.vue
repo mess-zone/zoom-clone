@@ -119,7 +119,7 @@ const {
 } = useLocalStream(video)
 
 //p2p
-const { open, destroy, call, peerId, peer, channels, _addMediaConnection, _closeAllConnectionsFromUser } = usePeer();
+const { open, destroy, call, peer, channels, _addMediaConnection, _closeAllConnectionsFromUser } = usePeer();
 
 const userId = ref<string>('')
 

@@ -44,7 +44,7 @@ export function usePeer() {
         return mediaConnection
     }
 
-    function _addMediaConnection(mediaConnection: MediaConnection) {
+    function _addMediaConnection(mediaConnection: MediaConnection | undefined) {
         if(mediaConnection) {
             console.log(`[peer] mediaConnection ${mediaConnection.connectionId}`, mediaConnection)
             channels.value.push(mediaConnection)
@@ -71,16 +71,18 @@ export function usePeer() {
         }
     }
 
-    function _removeMediaConnection(mediaConnection: MediaConnection) {
-        console.log(`[peer] mediaConnection ${mediaConnection.connectionId} removed from list`);
-
-        const index = channels.value.indexOf(mediaConnection);
-        channels.value.splice(index, 1);
+    function _removeMediaConnection(mediaConnection: MediaConnection | undefined) {
+        if(mediaConnection) {
+            console.log(`[peer] mediaConnection ${mediaConnection.connectionId} removed from list`);
+    
+            const index = channels.value.indexOf(mediaConnection);
+            channels.value.splice(index, 1);
+        }
     }
 
     function _closeAllConnectionsFromUser(peerId: string) {
         console.log('[peer] close all connections from user ', peerId)
-        const channelsToClose = channels.value.filter(c => c.peer === peerId)
+        const channelsToClose = channels.value.filter(c => c.peer === peerId) as MediaConnection[]
         for(const channel of channelsToClose) {
             // channel.close()
             console.log(channel)
