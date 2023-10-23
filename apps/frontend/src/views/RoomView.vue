@@ -2,8 +2,10 @@
     <div class="page">
         <div ref="streamGrid" id="streamGrid">
             {{ peerId }}
-            <StreamPreview v-for="item in clientsComputed" :key="item.peerId" :id="item.peerId">
-                {{ item }} <span>{{ item.peerId === userId ? 'LOCAL' : 'REMOTE' }}</span>
+            <StreamPreview v-for="item in channels" :key="item.connectionId" :id="item.connectionId">
+                {{ item.connectionId }}
+                id: {{ item.remoteStream?.id }}
+                active: {{ item.remoteStream?.active }}
             </StreamPreview>
         </div>
 
@@ -170,7 +172,7 @@ room.socket.on("user-connected", (userId) => {
 
 room.socket.on("user-disconnected", (userId) => {
     console.log(userId, "disconnected");
-    console.log(peers);
+    // console.log(peers);
     clients.value.delete(userId)
     addToast({ message: `${userId} saiu da reunião`})
     // if(peers[userId]) {

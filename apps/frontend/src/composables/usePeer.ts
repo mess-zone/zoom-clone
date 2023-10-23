@@ -45,6 +45,12 @@ export function usePeer() {
 
             mediaConnection.on('stream', (stream) => {
                 console.log(`[peer] mediaConnection ${mediaConnection.connectionId} received remote stream ${stream.active}`, stream);
+                stream.addEventListener('active', (e) => {
+                    console.log(`[peer] media stream active`, e)
+                })
+                stream.addEventListener('inactive', (e) => {
+                    console.log(`[peer] media stream inactive`, e)
+                })
             })
 
             mediaConnection.on('close', () => {
