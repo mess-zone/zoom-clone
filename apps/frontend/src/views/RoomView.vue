@@ -1,6 +1,7 @@
 <template>
     <div class="page">
         <div ref="streamGrid" id="streamGrid">
+            {{ peerId }}
             <StreamPreview v-for="item in clientsComputed" :key="item.peerId" :id="item.peerId">
                 {{ item }} <span>{{ item.peerId === userId ? 'LOCAL' : 'REMOTE' }}</span>
             </StreamPreview>
@@ -125,7 +126,7 @@ const {
 } = useLocalStream(video)
 
 //p2p
-const {peer} = usePeer();
+const { peerId, peer } = usePeer();
 // const peer = new Peer();
 
 const peers = {};
@@ -135,10 +136,10 @@ const userId = ref<string>('')
 /**
  * 1º when my peer object is created, join the socket room
  */
-peer.on("open", (peerId) => {
+peer.on("open", (id) => {
     // TODO It's not recommended that you use this ID to identify peers, as it's meant to be used for brokering connections only. You're recommended to set the metadata option to send other identifying information.
-    userId.value = peerId
-    console.log(`[peer] peer connection opened, peerId: ${peerId}`, peer);
+    userId.value = id
+    console.log(`[peer] peer connection opened, peerId: ${id}`, peer);
     room.joinRoom(userId)
 });
 
@@ -231,6 +232,7 @@ function closeSettingsModal() {
 
 // TODO reset room when leaving?
 function handleLeaveRoom() {
+    peer.destroy()
     room.leaveRoom(userId)
     room.active = false
 }
