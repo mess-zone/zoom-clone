@@ -35,11 +35,16 @@ export function usePeer() {
     function destroy() {
         peer.value?.destroy()
     }
+
+    function call(destPeerId: string, localStream: MediaStream, metadata: Object) {
+        return peer.value?.call(destPeerId, localStream, metadata)
+    }
     
 
     return {
         open,
         destroy,
+        call,
         peerId,
         peer,
         channels,

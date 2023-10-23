@@ -126,7 +126,7 @@ const {
 } = useLocalStream(video)
 
 //p2p
-const { open, destroy, peerId, peer } = usePeer();
+const { open, destroy, call, peerId, peer } = usePeer();
 // const peer = new Peer();
 
 const peers = {};
@@ -142,7 +142,6 @@ if(peer.value) {
     peer.value.on("open", (id) => {
         // TODO It's not recommended that you use this ID to identify peers, as it's meant to be used for brokering connections only. You're recommended to set the metadata option to send other identifying information.
         userId.value = id
-        console.log(`[peer] peer connection opened, peerId: ${id}`, peer);
         room.joinRoom(userId)
     });
     
@@ -187,10 +186,12 @@ room.socket.on("user-disconnected", (userId) => {
 
 
 function connectToNewUser(destPeerId, localStream) {
-    if(peer.value) {
-        console.log(`[peer] calling user ${destPeerId} who joinded room ?, sendig my stream: `, localStream);
-        // call destination peer
-        const mediaConnection = peer.value.call(destPeerId, localStream, { metadata: { foo: `[peer] calling user ${destPeerId} who joinded room` } });
+    console.log(`[peer] calling user ${destPeerId} who joinded room ?, sendig my stream: `, localStream);
+    // call destination peer
+    const metadata = { foo: `[peer] calling user ${destPeerId} who joinded room` }
+    const mediaConnection = call(destPeerId, localStream, metadata);
+
+    if(mediaConnection) {
         const video = document.createElement("video");
         mediaConnection.on("stream", (userVideoStream) => {
             console.log('[peer] stream remoto recebido ao ligar para usuário:', userVideoStream)
