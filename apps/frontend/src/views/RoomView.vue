@@ -24,7 +24,7 @@
         </div>
 
         <div id="streamGrid">
-            <StreamPreview v-for="item in channels" :key="item.connectionId" :id="item.connectionId" :mediaConnection="(item as MediaConnection)" :remoteStream="item.remoteStream" :localPeerId="user.peerId"></StreamPreview>
+            <StreamPreview v-for="item in mediaChannels" :key="item.connectionId" :id="item.connectionId" :mediaConnection="(item as MediaConnection)" :remoteStream="item.remoteStream" :localPeerId="user.peerId"></StreamPreview>
         </div>
 
         <div class="footer-bar">
@@ -123,6 +123,10 @@ const {
 
 //p2p
 const { open, destroy, call, peer, channels, _addMediaConnection, _closeAllConnectionsFromUser } = usePeer();
+
+const mediaChannels = computed(() => {
+    return channels.value.filter(c => c.type == 'media') as MediaConnection[]
+})
 
 const userId = ref<string>('')
 

@@ -1,6 +1,6 @@
 import { shallowRef, ref, ShallowRef } from "vue";
 import { makePeer } from "../config/peer";
-import Peer, { MediaConnection } from "peerjs";
+import Peer, { DataConnection, MediaConnection } from "peerjs";
 
 export function usePeer() {
 
@@ -8,7 +8,7 @@ export function usePeer() {
 
     const peer: ShallowRef<Peer | undefined> = shallowRef(undefined);
 
-    const channels = ref<MediaConnection[]>([])
+    const channels = ref<(DataConnection | MediaConnection)[]>([])
 
     function open() {
         peer.value = makePeer();
@@ -40,12 +40,51 @@ export function usePeer() {
         peer.value?.destroy()
     }
     
+    /**
+     * Abrir media connection
+    */
     function call(destPeerId: string, localStream: MediaStream, metadata: Object) {
         console.log(`[peer] calling the remote peer ${destPeerId}`, metadata);
         const mediaConnection = peer.value?.call(destPeerId, localStream, { metadata })
         _addMediaConnection(mediaConnection)
 
         return mediaConnection
+    }
+
+    /*
+    Abrir data connection
+    */
+    function connect(destPeerId: string) {
+        console.log(`[peer] open remote peer ${destPeerId} data connection`);
+        const dataConnection = peer.value?.connect(destPeerId);
+        _addDataConnection(dataConnection)
+
+        return dataConnection
+    }
+
+    function _addDataConnection(dataConnection: DataConnection | undefined) {
+        if(dataConnection) {
+            console.log(`[peer] dataConnection ${dataConnection.connectionId} added`, dataConnection)
+            channels.value.push(dataConnection)
+
+            dataConnection.on('open', () => {
+                console.log(`[peer] dataConnection ${dataConnection.connectionId} open and ready-to-use`);
+            })
+
+            dataConnection.on('data', (data) => {
+                console.log(`[peer] dataConnection ${dataConnection.connectionId} received data`, data);
+            })
+
+            dataConnection.on('close', () => {
+                console.log(`[peer] dataConnection ${dataConnection.connectionId} closed`);
+                // _removeMediaConnection(mediaConnection)
+            })
+
+            dataConnection.on("error", (e) => {
+                console.error(`[peer] dataConnection peer error`, e);
+                _removeConnection(dataConnection)
+            });
+        }
     }
 
     function _addMediaConnection(mediaConnection: MediaConnection | undefined) {
@@ -64,33 +103,33 @@ export function usePeer() {
             })
 
             mediaConnection.on('close', () => {
-                console.log(`[peer] mediaConnection ${mediaConnection.connectionId} closed media connection`);
+                console.log(`[peer] mediaConnection ${mediaConnection.connectionId} closed`);
                 // _removeMediaConnection(mediaConnection)
             })
 
             mediaConnection.on("error", (e) => {
                 console.error(`[peer] mediaConnection peer error`, e);
-                _removeMediaConnection(mediaConnection)
+                _removeConnection(mediaConnection)
             });
         }
     }
 
-    function _removeMediaConnection(mediaConnection: MediaConnection | undefined) {
-        if(mediaConnection) {
-            console.log(`[peer] mediaConnection ${mediaConnection.connectionId} removed from list`);
+    function _removeConnection(connection: MediaConnection | DataConnection | undefined) {
+        if(connection) {
+            console.log(`[peer] ${connection.type} connection ${connection.connectionId} removed from list`);
     
-            const index = channels.value.indexOf(mediaConnection);
+            const index = channels.value.indexOf(connection);
             channels.value.splice(index, 1);
         }
     }
 
     function _closeAllConnectionsFromUser(peerId: string) {
         console.log('[peer] close all connections from user ', peerId)
-        const channelsToClose = channels.value.filter(c => c.peer === peerId) as MediaConnection[]
+        const channelsToClose = channels.value.filter(c => c.peer === peerId)
         for(const channel of channelsToClose) {
             // channel.close()
             console.log(channel)
-            _removeMediaConnection(channel)
+            _removeConnection(channel as MediaConnection | DataConnection)
         }
     }
     
@@ -99,6 +138,7 @@ export function usePeer() {
         open,
         destroy,
         call,
+        connect,
         peerId,
         peer,
         channels,
