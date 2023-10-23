@@ -23,13 +23,9 @@
             </div>
         </div>
 
-        <div ref="streamGrid" id="streamGrid">
+        <div id="streamGrid">
             <StreamPreview v-for="item in channels" :key="item.connectionId" :id="item.connectionId" :mediaConnection="(item as MediaConnection)" :remoteStream="item.remoteStream"></StreamPreview>
         </div>
-
-        <div ref="videoGrid" id="videoGrid">
-        </div>
-
 
         <div class="footer-bar">
             <ToastContainer class="bottom-toast-container" />
@@ -125,61 +121,37 @@ const {
 //p2p
 const { open, destroy, call, peerId, peer, channels, _addMediaConnection } = usePeer();
 
-const peers = {};
-
 const userId = ref<string>('')
 
 open()
 
 if(peer.value) {
-    /**
-     * 1º when my peer object is created, join the socket room
-     */
+    // when my peer object is created, join the socket room
     peer.value.on("open", (id) => {
         // TODO It's not recommended that you use this ID to identify peers, as it's meant to be used for brokering connections only. You're recommended to set the metadata option to send other identifying information.
         userId.value = id
         room.joinRoom(userId)
     });
     
-    
     // se algum peer me liga, o evento call é acionado
     peer.value.on("call", (mediaConnection) => {
         _addMediaConnection(mediaConnection)
-        // console.log('[peer] atendendo chamada de ?, sending my local stream')
-        // console.log(stream.value)
-        // console.log(mediaConnection.metadata)
         mediaConnection.answer(stream.value);
-    
-        // const video = document.createElement("video");
-        // mediaConnection.on("stream", (userVideoStream) => {
-        //     // console.log('[peer] stream remoto recebido ao atender chamada:', userVideoStream)
-        //     addVideoStream(video, userVideoStream);
-        // });
     });
 }
 
 room.socket.on("user-connected", (userId) => {
-    console.log(`user ${userId} joined the room ?`);
+    console.log(`[socket] user ${userId} joined the room ?`);
     clients.value.set(userId, { peerId: userId })
     addToast({ message: `${userId} entrou na reunião`})
     connectToNewUser(userId, stream.value);
 });
 
 room.socket.on("user-disconnected", (userId) => {
-    console.log(userId, "disconnected");
-    // console.log(peers);
+    console.log(`[socket] ${userId} disconnected`);
     clients.value.delete(userId)
     addToast({ message: `${userId} saiu da reunião`})
-    // if(peers[userId]) {
-    peers[userId].close();
-    // }
 });
-
-
-
-
-
-
 
 
 /**
@@ -188,46 +160,11 @@ room.socket.on("user-disconnected", (userId) => {
  * @param localStream 
  */
 function connectToNewUser(destPeerId, localStream) {
-    // console.log(`[peer] calling user ${destPeerId} who joinded room ?, sendig my stream: `, localStream);
     // call destination peer
     const metadata = { foo: `calling user ${destPeerId} who joinded room` }
     call(destPeerId, localStream, metadata);
 
-    // if(mediaConnection) {
-    //     const video = document.createElement("video");
-    //     mediaConnection.on("stream", (userVideoStream) => {
-    //         // console.log('[peer] stream remoto recebido ao ligar para usuário:', userVideoStream)
-    //         addVideoStream(video, userVideoStream);
-    //     });
-    //     mediaConnection.on("error", () => {
-    //         video.remove();
-    //     });
-    //     mediaConnection.on("close", () => {
-    //         video.remove();
-    //     });
-    
-    
-    //     peers[destPeerId] = mediaConnection;
-    // }
 }
-
-const videoGrid = ref<HTMLDivElement>();
-
-const streamGrid = ref<HTMLDivElement>();
-
-// function addVideoStream(video, stream) {
-//     // console.log("ADD VIDEO STREAM", video) 
-//     // streamGrid.value?.querySelectorAll('.stream-preview')
-//     video.srcObject = stream;
-//     video.classList.add('video-remote')
-//     video.addEventListener("loadedmetadata", () => {
-//         video.play();
-//     });
-
-//     if (videoGrid.value) {
-//         videoGrid.value.append(video);
-//     }
-// }
 
 const settingsModalIsOpen = ref(false)
 
