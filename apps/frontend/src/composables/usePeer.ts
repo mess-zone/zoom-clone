@@ -1,6 +1,6 @@
 import { shallowRef, ref, ShallowRef } from "vue";
 import { makePeer } from "../config/peer";
-import Peer from "peerjs";
+import Peer, { MediaConnection } from "peerjs";
 
 export function usePeer() {
 
@@ -8,7 +8,7 @@ export function usePeer() {
 
     const peer: ShallowRef<Peer | undefined> = shallowRef(undefined);
 
-    const channels = ref([])
+    const channels = ref<MediaConnection[]>([])
 
     function open() {
         peer.value = makePeer();
@@ -31,13 +31,32 @@ export function usePeer() {
             console.log(`[peer] a remote peer attempts to call you`, mediaConnection);
         })
     }
-
+    
     function destroy() {
         peer.value?.destroy()
     }
-
+    
     function call(destPeerId: string, localStream: MediaStream, metadata: Object) {
-        return peer.value?.call(destPeerId, localStream, metadata)
+        console.log(`[peer] calling the remote peer ${destPeerId}`, metadata);
+        const mediaConnection = peer.value?.call(destPeerId, localStream, { metadata })
+        if(mediaConnection) {
+            console.log(`[peer] mediaConnection ${mediaConnection.connectionId}`, mediaConnection)
+            channels.value.push(mediaConnection)
+
+            mediaConnection.on('stream', (stream) => {
+                console.log(`[peer] mediaConnection ${mediaConnection.connectionId} received remote stream ${stream.active}`, stream);
+            })
+
+            mediaConnection.on('close', () => {
+                console.log(`[peer] mediaConnection ${mediaConnection.connectionId} closed media connection`);
+                // TODO when media connection closes, remove it from channels array
+            })
+
+            mediaConnection.on("error", (e) => {
+                console.error(`[peer] mediaConnection peer error`, e);
+            });
+        }
+        return mediaConnection
     }
     
 

@@ -126,7 +126,7 @@ const {
 } = useLocalStream(video)
 
 //p2p
-const { open, destroy, call, peerId, peer } = usePeer();
+const { open, destroy, call, peerId, peer, channels } = usePeer();
 // const peer = new Peer();
 
 const peers = {};
@@ -148,14 +148,14 @@ if(peer.value) {
     
     // se algum peer me liga, o evento call é acionado
     peer.value.on("call", (mediaConnection) => {
-        console.log('[peer] atendendo chamada de ?, sending my local stream:')
-        console.log(stream.value)
-        console.log(mediaConnection.metadata)
+        // console.log('[peer] atendendo chamada de ?, sending my local stream')
+        // console.log(stream.value)
+        // console.log(mediaConnection.metadata)
         mediaConnection.answer(stream.value);
     
         const video = document.createElement("video");
         mediaConnection.on("stream", (userVideoStream) => {
-            console.log('[peer] stream remoto recebido ao atender chamada:', userVideoStream)
+            // console.log('[peer] stream remoto recebido ao atender chamada:', userVideoStream)
             addVideoStream(video, userVideoStream);
         });
     });
@@ -186,15 +186,15 @@ room.socket.on("user-disconnected", (userId) => {
 
 
 function connectToNewUser(destPeerId, localStream) {
-    console.log(`[peer] calling user ${destPeerId} who joinded room ?, sendig my stream: `, localStream);
+    // console.log(`[peer] calling user ${destPeerId} who joinded room ?, sendig my stream: `, localStream);
     // call destination peer
-    const metadata = { foo: `[peer] calling user ${destPeerId} who joinded room` }
+    const metadata = { foo: `calling user ${destPeerId} who joinded room` }
     const mediaConnection = call(destPeerId, localStream, metadata);
 
     if(mediaConnection) {
         const video = document.createElement("video");
         mediaConnection.on("stream", (userVideoStream) => {
-            console.log('[peer] stream remoto recebido ao ligar para usuário:', userVideoStream)
+            // console.log('[peer] stream remoto recebido ao ligar para usuário:', userVideoStream)
             addVideoStream(video, userVideoStream);
         });
         mediaConnection.on("error", () => {
