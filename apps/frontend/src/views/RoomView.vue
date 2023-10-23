@@ -89,12 +89,14 @@ import { useRoute } from "vue-router";
 import { useRoomStore } from '../stores/useRoomStore'
 import { useToasts } from '../composables/useToasts'
 import { useLocalStream } from '../composables/useLocalStream'
+// import { peer } from '../config/peer'
 
-import { Peer } from "peerjs";
 
 import SettingsModal from "../components/organisms/SettingsModal.vue";
 import ToastContainer from "../components/molecules/ToastContainer.vue";
 import StreamPreview from "../components/molecules/StreamPreview.vue";
+import Peer from "peerjs";
+
 
 const route = useRoute();
 
@@ -387,4 +389,4 @@ function handleLeaveRoom() {
   object-fit: cover;
 }
 
-</style>
+</style>../config/peer
