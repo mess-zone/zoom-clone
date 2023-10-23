@@ -181,6 +181,11 @@ room.socket.on("user-disconnected", (userId) => {
 
 
 
+/**
+ * @deprecated
+ * @param destPeerId 
+ * @param localStream 
+ */
 function connectToNewUser(destPeerId, localStream) {
     // console.log(`[peer] calling user ${destPeerId} who joinded room ?, sendig my stream: `, localStream);
     // call destination peer

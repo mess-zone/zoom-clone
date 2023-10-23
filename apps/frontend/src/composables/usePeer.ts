@@ -39,6 +39,12 @@ export function usePeer() {
     function call(destPeerId: string, localStream: MediaStream, metadata: Object) {
         console.log(`[peer] calling the remote peer ${destPeerId}`, metadata);
         const mediaConnection = peer.value?.call(destPeerId, localStream, { metadata })
+        _addMediaConnection(mediaConnection)
+
+        return mediaConnection
+    }
+
+    function _addMediaConnection(mediaConnection: MediaConnection) {
         if(mediaConnection) {
             console.log(`[peer] mediaConnection ${mediaConnection.connectionId}`, mediaConnection)
             channels.value.push(mediaConnection)
@@ -55,14 +61,19 @@ export function usePeer() {
 
             mediaConnection.on('close', () => {
                 console.log(`[peer] mediaConnection ${mediaConnection.connectionId} closed media connection`);
-                // TODO when media connection closes, remove it from channels array
+                _removeMediaConnection(mediaConnection)
             })
 
             mediaConnection.on("error", (e) => {
                 console.error(`[peer] mediaConnection peer error`, e);
+                _removeMediaConnection(mediaConnection)
             });
         }
-        return mediaConnection
+    }
+
+    function _removeMediaConnection(mediaConnection: MediaConnection) {
+        const index = channels.value.indexOf(mediaConnection);
+        channels.value.splice(index, 1);
     }
     
 
