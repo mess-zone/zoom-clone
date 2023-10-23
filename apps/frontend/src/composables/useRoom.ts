@@ -2,9 +2,9 @@ import { MaybeRefOrGetter, reactive, ref, toValue } from "vue"
 import { state, socket } from "../config/socket";
 
 interface User {
-    peerId: string,
-    name: string,
-    color: string,
+    peerId?: string,
+    name?: string,
+    color?: string,
 }
 
 export function useRoom() {
@@ -54,7 +54,6 @@ export function useRoom() {
             const response = await socket.emitWithAck("join-meeting", rId.value, u);
 
             response.forEach(peer => {
-                console.log(peer)
                 clients.set(peer.peerId, peer)
             });
         } catch(e) {

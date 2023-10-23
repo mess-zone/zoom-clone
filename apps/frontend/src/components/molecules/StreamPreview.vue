@@ -2,30 +2,34 @@
     <div class="stream-preview">
         <video ref="video" autoplay muted></video>
         <div class="front">
-            {{ props.mediaConnection?.type }}
-            {{ props.mediaConnection?.connectionId }}
-            id: {{ props.mediaConnection?.remoteStream?.id }}
-            remoteStream: {{ props.remoteStream?.id }}
-            active: {{ props.remoteStream?.active }}
+            {{ remoteUser.name }} {{ remoteUser.color }}
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { MediaConnection } from 'peerjs';
-import { ref, watch } from 'vue';
+import { ref, watchEffect } from 'vue';
 
 const props = defineProps<{
   mediaConnection: MediaConnection,
   remoteStream: MediaStream,
+  localPeerId: string | undefined,
 }>()
 
 const video = ref<HTMLVideoElement>()
 
-watch(() => props.remoteStream, () => {
-    console.log('WATCH remote stream changed', props.remoteStream)
+const metadata = ref(props.mediaConnection?.metadata)
+
+const remoteUser = ref()
+
+watchEffect(() => {
     if(video.value) {
         video.value.srcObject = props.remoteStream
+    }
+
+    if(props.localPeerId) {
+        remoteUser.value = metadata.value.users.find(u => u.peerId !== props.localPeerId)
     }
 })
 
@@ -52,6 +56,8 @@ watch(() => props.remoteStream, () => {
 }
 
 .front {
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 8px;
     position: absolute;
     bottom: 0;
     left: 0;

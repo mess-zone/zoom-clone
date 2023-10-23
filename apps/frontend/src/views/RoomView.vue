@@ -24,7 +24,7 @@
         </div>
 
         <div id="streamGrid">
-            <StreamPreview v-for="item in channels" :key="item.connectionId" :id="item.connectionId" :mediaConnection="(item as MediaConnection)" :remoteStream="item.remoteStream"></StreamPreview>
+            <StreamPreview v-for="item in channels" :key="item.connectionId" :id="item.connectionId" :mediaConnection="(item as MediaConnection)" :remoteStream="item.remoteStream" :localPeerId="user.peerId"></StreamPreview>
         </div>
 
         <div class="footer-bar">
@@ -123,6 +123,18 @@ const { open, destroy, call, peer, channels, _addMediaConnection, _closeAllConne
 
 const userId = ref<string>('')
 
+interface User {
+    peerId?: string,
+    name?: string,
+    color?: string,
+}
+
+const user = ref<User>({
+    peerId: undefined,
+    name: undefined,
+    color: undefined,
+})
+
 open()
 
 if(peer.value) {
@@ -131,7 +143,7 @@ if(peer.value) {
         // TODO It's not recommended that you use this ID to identify peers, as it's meant to be used for brokering connections only. You're recommended to set the metadata option to send other identifying information.
         userId.value = id
 
-        const user = {
+        user.value = {
             peerId: userId.value,
             ...generateRandomUser()
         }
@@ -146,13 +158,14 @@ if(peer.value) {
 }
 
 room.socket.on("user-connected", (user) => {
-    console.log(`[socket] user ${user.peerId} joined the room:`, user);
+    console.log(`[socket] user ${user.name} joined the room:`, user);
     clients.value.set(user.peerId, user)
-    addToast({ message: `${user.peerId} entrou na reunião`})
-    connectToNewUser(user.peerId, stream.value);
+    addToast({ message: `${user.name} entrou na reunião`})
+    connectToNewUser(user, stream.value);
 });
 
 room.socket.on("user-disconnected", (userId) => {
+    // TODO show user name
     console.log(`[socket] remote user ${userId} leaved the room`);
     clients.value.delete(userId)
     addToast({ message: `${userId} saiu da reunião`})
@@ -165,11 +178,10 @@ room.socket.on("user-disconnected", (userId) => {
  * @param destPeerId 
  * @param localStream 
  */
-function connectToNewUser(destPeerId, localStream) {
+function connectToNewUser(destUser, localStream) {
     // call destination peer
-    const metadata = { foo: `calling user ${destPeerId} who joinded room` }
-    call(destPeerId, localStream, metadata);
-
+    const users = [destUser, {...user.value}]
+    call(destUser.peerId, localStream, { users });
 }
 
 
@@ -333,6 +345,7 @@ function handleLeaveRoom() {
   align-items: center;
   gap: 15px;
   padding: 30px;
+  margin-bottom: 100px;
 }
 
 #streamGrid > video {
