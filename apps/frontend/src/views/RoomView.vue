@@ -126,7 +126,7 @@ const {
 } = useLocalStream(video)
 
 //p2p
-const { open, peerId, peer } = usePeer();
+const { open, destroy, peerId, peer } = usePeer();
 // const peer = new Peer();
 
 const peers = {};
@@ -238,7 +238,7 @@ function closeSettingsModal() {
 
 // TODO reset room when leaving?
 function handleLeaveRoom() {
-    peer.value?.destroy()
+    destroy()
     room.leaveRoom(userId)
     room.active = false
 }

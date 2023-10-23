@@ -31,10 +31,15 @@ export function usePeer() {
             console.log(`[peer] a remote peer attempts to call you`, mediaConnection);
         })
     }
+
+    function destroy() {
+        peer.value?.destroy()
+    }
     
 
     return {
         open,
+        destroy,
         peerId,
         peer,
         channels,
