@@ -165,7 +165,14 @@ if(peer.value) {
 
     peer.value.on("connection", (dataConnection) => {
         _addDataConnection(dataConnection)
+        dataConnection.on('open', () => {
+            // receive messages
+            dataConnection.on('data', (e) => {
+                console.log('MANO TEM CERTEZA QUE NÃO RECEBE ENVENTOS?', e)
+            })
+        })
     })
+
 }
 
 room.socket.on("user-connected", (user) => {
@@ -191,10 +198,22 @@ room.socket.on("user-disconnected", (userId) => {
  */
 function connectToNewUser(destUser, localStream) {
     const users = [destUser, {...user.value}]
+    
+    // data controller connection
     const streamControllerConnection = connect(destUser.peerId, { label: 'stream-controller' })
-    streamControllerConnection?.on('open', () => {
-        streamControllerConnection?.send('recebeu esse texto?')
-    })
+    if(streamControllerConnection){
+        streamControllerConnection.on('open', () => {
+            // receive messages
+            streamControllerConnection.on('data', (e) => {
+                console.log('connectToNewUser MANO TEM CERTEZA QUE NÃO RECEBE ENVENTOS?', e)
+            })
+    
+            // send messages
+            console.log('sendind UPDATE-USER-INFO data', { event: 'updated-user-info', data: {...user.value} })
+            streamControllerConnection.send({ event: 'updated-user-info', data: {...user.value} })
+        })
+    }
+
     // call destination peer
     call(destUser.peerId, localStream, { users });
 }

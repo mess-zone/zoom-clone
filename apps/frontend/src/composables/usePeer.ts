@@ -127,8 +127,6 @@ export function usePeer() {
         console.log('[peer] close all connections from user ', peerId)
         const channelsToClose = channels.value.filter(c => c.peer === peerId)
         for(const channel of channelsToClose) {
-            // channel.close()
-            console.log(channel)
             _removeConnection(channel as MediaConnection | DataConnection)
         }
     }
