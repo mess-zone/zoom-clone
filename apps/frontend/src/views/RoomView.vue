@@ -89,12 +89,11 @@ import { useRoute } from "vue-router";
 import { useRoomStore } from '../stores/useRoomStore'
 import { useToasts } from '../composables/useToasts'
 import { useLocalStream } from '../composables/useLocalStream'
-import { makePeer } from '../config/peer'
-
 
 import SettingsModal from "../components/organisms/SettingsModal.vue";
 import ToastContainer from "../components/molecules/ToastContainer.vue";
 import StreamPreview from "../components/molecules/StreamPreview.vue";
+import { usePeer } from "../composables/usePeer";
 
 
 const route = useRoute();
@@ -126,7 +125,7 @@ const {
 } = useLocalStream(video)
 
 //p2p
-const peer = makePeer();
+const {peer} = usePeer();
 // const peer = new Peer();
 
 const peers = {};
