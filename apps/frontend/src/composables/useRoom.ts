@@ -3,6 +3,8 @@ import { state, socket } from "../config/socket";
 
 interface User {
     peerId: string,
+    name: string,
+    color: string,
 }
 
 export function useRoom() {
@@ -45,14 +47,14 @@ export function useRoom() {
         return socket.emitWithAck('create-meeting')
     }
 
-    async function joinRoom(userId: MaybeRefOrGetter<string>) {
-        const uId = toValue(userId)
-        console.log('[useRoom] join-meeting', rId.value, uId)
+    async function joinRoom(user: MaybeRefOrGetter<User>) {
+        const u = toValue(user)
+        console.log('[useRoom] join-meeting', rId.value, u)
         try {
-            const response = await socket.emitWithAck("join-meeting", rId.value, uId);
+            const response = await socket.emitWithAck("join-meeting", rId.value, u);
 
             response.forEach(peer => {
-                // console.log(peer)
+                console.log(peer)
                 clients.set(peer.peerId, peer)
             });
         } catch(e) {

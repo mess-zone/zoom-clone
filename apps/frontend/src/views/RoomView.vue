@@ -92,7 +92,7 @@ import ToastContainer from "../components/molecules/ToastContainer.vue";
 import StreamPreview from "../components/molecules/StreamPreview.vue";
 import { usePeer } from "../composables/usePeer";
 import { MediaConnection } from "peerjs";
-
+import { generateRandomUser } from "../utils/randomUser"
 
 const route = useRoute();
 
@@ -130,7 +130,12 @@ if(peer.value) {
     peer.value.on("open", (id) => {
         // TODO It's not recommended that you use this ID to identify peers, as it's meant to be used for brokering connections only. You're recommended to set the metadata option to send other identifying information.
         userId.value = id
-        room.joinRoom(userId)
+
+        const user = {
+            peerId: userId.value,
+            ...generateRandomUser()
+        }
+        room.joinRoom(user)
     });
     
     // se algum peer me liga, o evento call é acionado
@@ -140,11 +145,11 @@ if(peer.value) {
     });
 }
 
-room.socket.on("user-connected", (userId) => {
-    console.log(`[socket] user ${userId} joined the room`);
-    clients.value.set(userId, { peerId: userId })
-    addToast({ message: `${userId} entrou na reunião`})
-    connectToNewUser(userId, stream.value);
+room.socket.on("user-connected", (user) => {
+    console.log(`[socket] user ${user.peerId} joined the room:`, user);
+    clients.value.set(user.peerId, user)
+    addToast({ message: `${user.peerId} entrou na reunião`})
+    connectToNewUser(user.peerId, stream.value);
 });
 
 room.socket.on("user-disconnected", (userId) => {
@@ -166,6 +171,8 @@ function connectToNewUser(destPeerId, localStream) {
     call(destPeerId, localStream, metadata);
 
 }
+
+
 
 const settingsModalIsOpen = ref(false)
 
@@ -338,4 +345,4 @@ function handleLeaveRoom() {
   object-fit: cover;
 }
 
-</style>../config/peer
+</style>../config/peer../utils/randomUser

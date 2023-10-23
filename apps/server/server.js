@@ -71,21 +71,28 @@ io.on('connection', socket => {
         callback({ roomId: uuidV4() })
     } )
 
-    socket.on('join-meeting', (roomId, userId, callback) => {
-        console.log('[join-meeting]', socket.id, roomId, userId)
+    socket.on('join-meeting', (roomId, user, callback) => {
+        const userId = user.peerId
+        console.log('[join-meeting]', socket.id, roomId, user)
         socket.join(roomId)
+        // FIX garantir suporte ao mesmo usuarios em várias rooms simultâneas
         joinUser({
             roomId: roomId,
             socketId: socket.id,
-            peerId: userId,
+            ...user,
         })
 
         const users = Object.fromEntries(rooms.get(roomId))
-        const peerIds = Object.values(users).map(u => ({ peerId: u.peerId }))
-        callback(peerIds)
+        const formatedUsers = Object.values(users)
+            .map(u => ({ 
+                peerId: u.peerId, 
+                name: u.name, 
+                color: u.color 
+            }))
+        callback(formatedUsers)
 
         // TODO rename to joined-meeting
-        socket.to(roomId).emit('user-connected', userId)
+        socket.to(roomId).emit('user-connected', user)
 
         socket.on('disconnect', () => {
             console.log('### disconnect', roomId, userId)
