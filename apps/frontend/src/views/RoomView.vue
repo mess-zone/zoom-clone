@@ -119,7 +119,7 @@ const {
 } = useLocalStream(video)
 
 //p2p
-const { open, destroy, call, peerId, peer, channels, _addMediaConnection } = usePeer();
+const { open, destroy, call, peerId, peer, channels, _addMediaConnection, _closeAllConnectionsFromUser } = usePeer();
 
 const userId = ref<string>('')
 
@@ -141,16 +141,17 @@ if(peer.value) {
 }
 
 room.socket.on("user-connected", (userId) => {
-    console.log(`[socket] user ${userId} joined the room ?`);
+    console.log(`[socket] user ${userId} joined the room`);
     clients.value.set(userId, { peerId: userId })
     addToast({ message: `${userId} entrou na reunião`})
     connectToNewUser(userId, stream.value);
 });
 
 room.socket.on("user-disconnected", (userId) => {
-    console.log(`[socket] ${userId} disconnected`);
+    console.log(`[socket] remote user ${userId} leaved the room`);
     clients.value.delete(userId)
     addToast({ message: `${userId} saiu da reunião`})
+    _closeAllConnectionsFromUser(userId)
 });
 
 
@@ -178,7 +179,8 @@ function closeSettingsModal() {
 
 // TODO reset room when leaving?
 function handleLeaveRoom() {
-    destroy()
+    // TODO shoulD end all conections from user, not destroy peer
+    destroy() 
     room.leaveRoom(userId)
     room.active = false
 }
