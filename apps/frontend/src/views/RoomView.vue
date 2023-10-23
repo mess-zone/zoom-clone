@@ -131,20 +131,26 @@ const peers = {};
 
 const userId = ref<string>('')
 
+/**
+ * 1º when my peer object is created, join the socket room
+ */
 peer.on("open", (peerId) => {
+    // TODO It's not recommended that you use this ID to identify peers, as it's meant to be used for brokering connections only. You're recommended to set the metadata option to send other identifying information.
     userId.value = peerId
-    console.log("peer connection opened", userId.value);
+    console.log(`[peer] peer connection opened, peerId: ${peerId}`, peer);
     room.joinRoom(userId)
 });
 
-// 
-peer.on("call", (call) => {
-    console.log('[peer] atendendo chamada de ?, sending my stream:')
+
+// se algum peer me liga, o evento call é acionado
+peer.on("call", (mediaConnection) => {
+    console.log('[peer] atendendo chamada de ?, sending my local stream:')
     console.log(stream.value)
-    call.answer(stream.value);
+    console.log(mediaConnection.metadata)
+    mediaConnection.answer(stream.value);
 
     const video = document.createElement("video");
-    call.on("stream", (userVideoStream) => {
+    mediaConnection.on("stream", (userVideoStream) => {
         console.log('[peer] stream remoto recebido ao atender chamada:', userVideoStream)
         addVideoStream(video, userVideoStream);
     });
@@ -174,19 +180,24 @@ room.socket.on("user-disconnected", (userId) => {
 
 
 
-function connectToNewUser(userId, myStream) {
-    console.log(`[peer] calling user ${userId} who joinded room ?, sendig my stream: `, myStream);
-    const call = peer.call(userId, myStream);
+function connectToNewUser(destPeerId, localStream) {
+    console.log(`[peer] calling user ${destPeerId} who joinded room ?, sendig my stream: `, localStream);
+    // call destination peer
+    const mediaConnection = peer.call(destPeerId, localStream, { metadata: { foo: `[peer] calling user ${destPeerId} who joinded room` } });
     const video = document.createElement("video");
-    call.on("stream", (userVideoStream) => {
+    mediaConnection.on("stream", (userVideoStream) => {
         console.log('[peer] stream remoto recebido ao ligar para usuário:', userVideoStream)
         addVideoStream(video, userVideoStream);
     });
-    call.on("close", () => {
+    mediaConnection.on("error", () => {
+        video.remove();
+    });
+    mediaConnection.on("close", () => {
         video.remove();
     });
 
-    peers[userId] = call;
+
+    peers[destPeerId] = mediaConnection;
 }
 
 const videoGrid = ref<HTMLDivElement>();
