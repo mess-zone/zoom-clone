@@ -2,7 +2,8 @@
     <div class="stream-preview">
         <video ref="video" autoplay muted></video>
         <div class="front">
-            {{ remoteStream.user?.name }} {{ remoteStream.user?.color }} raised hand: {{ !!remoteStream.raisedHand }}
+            {{ remoteStream.user?.name }} {{ remoteStream.user?.color }}
+            <font-awesome-icon icon="fa-regular fa-hand" v-if="!!remoteStream.raisedHand"/>
         </div>
     </div>
 </template>
