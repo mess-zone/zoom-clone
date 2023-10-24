@@ -25,12 +25,10 @@
 
         <div id="streamGrid">
             <StreamPreview 
-                v-for="item in mediaChannels" 
-                :key="item.connectionId" 
-                :id="item.connectionId" 
-                :mediaConnection="(item as MediaConnection)" 
-                :remoteStream="item.remoteStream" 
-                :localPeerId="user.peerId"
+                v-for="item in remoteStreams" 
+                :key="item.id"
+                :remoteStream="(item as RemoteStream)"
+                :mediaStream="(item.mediaChannel?.remoteStream as MediaStream)"
             ></StreamPreview>
         </div>
 
@@ -130,11 +128,7 @@ const {
 } = useLocalStream(video)
 
 //p2p
-const { open, call, connect, peer, channels, _addMediaConnection, _addDataConnection, _closeAllConnectionsFromUser } = usePeer();
-
-const mediaChannels = computed(() => {
-    return channels.value.filter(c => c.type == 'media') as MediaConnection[]
-})
+const { open, call, connect, peer, _addMediaConnection, _addDataConnection, _closeAllConnectionsFromUser } = usePeer();
 
 const userId = ref<string>('')
 
@@ -152,8 +146,9 @@ const user = ref<User>({
 
 open()
 
+// TODO duplicated definition
 interface RemoteStream {
-    id: string, // mediaChannel connectionId
+    id: string,
     peerId: string,
     mediaChannel: MediaConnection | null,
     dataChannel: DataConnection | null,

@@ -8,29 +8,32 @@
 </template>
 
 <script setup lang="ts">
-import { MediaConnection } from 'peerjs';
+import { DataConnection, MediaConnection } from 'peerjs';
 import { ref, watchEffect } from 'vue';
 
+interface RemoteStream {
+    id: string,
+    peerId: string,
+    mediaChannel: MediaConnection | null,
+    dataChannel: DataConnection | null,
+    type: 'cam',
+}
+
 const props = defineProps<{
-  mediaConnection: MediaConnection,
-  remoteStream: MediaStream,
-  localPeerId: string | undefined,
+    remoteStream: RemoteStream,
+    // FIX o video só é exibido se passar o mediaStream separado como prop, tem algo errado com a reatividade do remoteStream prop
+    mediaStream: MediaStream,
 }>()
 
 const video = ref<HTMLVideoElement>()
 
-// const metadata = ref(props.mediaConnection?.metadata)
 
 const remoteUser = ref()
 
 watchEffect(() => {
     if(video.value) {
-        video.value.srcObject = props.remoteStream
+        video.value.srcObject = props.mediaStream
     }
-
-    // if(props.localPeerId) {
-    //     remoteUser.value = metadata.value.users.find(u => u.peerId !== props.localPeerId)
-    // }
 })
 
 
