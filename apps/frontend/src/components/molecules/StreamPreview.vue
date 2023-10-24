@@ -18,7 +18,7 @@ interface RemoteStream {
     peerId: string,
     mediaChannel: MediaConnection | null,
     dataChannel: DataConnection | null,
-    type: 'cam',
+    type: 'cam' | 'screen-share',
 
     user?: {
         name: string,

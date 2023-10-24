@@ -132,7 +132,7 @@ const size = computed(() => clients.value.size);
 const camVideo = ref<HTMLVideoElement>();
 
 const { 
-    stream, 
+    stream: camStream, 
     camIsEnabled, 
     micIsEnabled, 
     muteCam, 
@@ -189,7 +189,7 @@ interface RemoteStream {
     peerId: string,
     mediaChannel: MediaConnection | null,
     dataChannel: DataConnection | null,
-    type: 'cam',
+    type: 'cam' | 'screen-share',
 
     user?: {
         name: string,
@@ -238,6 +238,7 @@ function sendDataToRemoteStream(remoteStreamId: string, payload) {
     }
 }
 
+// TODO esse metodo deveria enviar dependendo do tipo: call ou screen-share. Se não pode dar muito errado ao já ter uma pessoa compartilhando a tela
 function sendToAllRemoteStreams(payload) {
     console.log('BROADCAST DATA TO ALL', payload)
     for(const remoteStream of remoteStreams.value) {
@@ -262,8 +263,14 @@ if(peer.value) {
     
     // se algum peer me liga, o evento call é acionado
     peer.value.on("call", (mediaConnection) => {
+        console.log('CHEGOU A REQUISIÇÃO DE COMPARTILHAR A TELA?', mediaConnection)
         _addMediaConnection(mediaConnection)
-        mediaConnection.answer(stream.value);
+
+        if(mediaConnection.metadata.remoteStreamType === 'cam') {
+            mediaConnection.answer(camStream.value);
+        } else if(mediaConnection.metadata.remoteStreamType === 'screen-share') {
+            mediaConnection.answer();
+        }
 
         // add remote stream to array of remote streams
         const remoteStream: RemoteStream = {
@@ -282,10 +289,12 @@ if(peer.value) {
             // receive messages
             dataConnection.on('data', (event) => handleStreamControllerEvents(event, dataConnection.metadata.remoteStreamId))
 
-            // send messages
-            const payload = { event: 'updated-user-info', data: { user: user.value, raisedHand: handIsRaised.value} }
-            console.log('sendind UPDATE-USER-INFO data', payload)
-            sendDataToRemoteStream(dataConnection.metadata.remoteStreamId, payload)
+            if(dataConnection.metadata.remoteStreamType === 'cam') {
+                // send messages
+                const payload = { event: 'updated-user-info', data: { user: user.value, raisedHand: handIsRaised.value} }
+                console.log('sendind UPDATE-USER-INFO data', payload)
+                sendDataToRemoteStream(dataConnection.metadata.remoteStreamId, payload)
+            }
         })
 
         // add remote stream to array of remote streams
@@ -305,7 +314,7 @@ room.socket.on("user-connected", (user) => {
     console.log(`[socket] user ${user.name} joined the room:`, user);
     clients.value.set(user.peerId, user)
     addToast({ message: `${user.name} entrou na reunião`})
-    connectToNewUser(user, stream.value);
+    connectToNewUser(user.peerId, camStream.value);
 });
 
 room.socket.on("user-disconnected", (userId) => {
@@ -359,12 +368,8 @@ function handleStreamControllerEvents(event, remoteStreamId) {
     }
 }
 
-/**
- * @deprecated
- * @param destPeerId 
- * @param localStream 
- */
-function connectToNewUser(destUser, localStream) {
+
+function connectToNewUser(destUserPeerId, localCamStream) {
 
     const remoteStreamId = uuidV4()
 
@@ -374,10 +379,10 @@ function connectToNewUser(destUser, localStream) {
     }
 
     // call destination peer
-    const mediaConnection = call(destUser.peerId, localStream, metadata);
+    const mediaConnection = call(destUserPeerId, localCamStream, metadata);
 
     // data controller connection
-    const streamControllerConnection = connect(destUser.peerId, { metadata })
+    const streamControllerConnection = connect(destUserPeerId, { metadata })
     if(streamControllerConnection && mediaConnection){
         streamControllerConnection.on('open', () => {
             // receive messages
@@ -387,7 +392,6 @@ function connectToNewUser(destUser, localStream) {
             const payload = { event: 'updated-user-info', data: { user: user.value, raisedHand: handIsRaised.value } }
             console.log('sendind UPDATE-USER-INFO data', payload)
             sendDataToRemoteStream(remoteStreamId, payload)
-            // streamControllerConnection.send({ event: 'updated-user-info', data: {...user.value} })
         })
 
 
@@ -395,7 +399,7 @@ function connectToNewUser(destUser, localStream) {
         // add remote stream to array of remote streams
         const remoteStream: RemoteStream = {
             id: remoteStreamId,
-            peerId: destUser.peerId,
+            peerId: destUserPeerId,
             mediaChannel: mediaConnection,
             dataChannel: streamControllerConnection,
             type: 'cam',
@@ -403,6 +407,44 @@ function connectToNewUser(destUser, localStream) {
         addToRemoteStreams(remoteStream)
     }
 
+}
+
+function connectToShareScreenWithUser(destUserPeerId, localSharedScreemStream) {
+    const remoteStreamId = uuidV4()
+
+    const metadata = {
+        remoteStreamId,
+        remoteStreamType: 'screen-share',
+    }
+
+    // call destination peer
+    const mediaConnection = call(destUserPeerId, localSharedScreemStream, metadata);
+    console.log('EU TO LIGANDO PRA COMPARTILHAR A TELA?', mediaConnection)
+
+    // data controller connection
+    const streamControllerConnection = connect(destUserPeerId, { metadata })
+    if(streamControllerConnection && mediaConnection){
+        streamControllerConnection.on('open', () => {
+            // receive messages
+            streamControllerConnection.on('data', (event) => handleStreamControllerEvents(event, remoteStreamId))
+    
+            // send messages
+            const payload = { event: 'updated-user-info', data: { user: user.value } }
+            sendDataToRemoteStream(remoteStreamId, payload)
+        })
+
+
+
+        // add remote stream to array of remote streams
+        const remoteStream: RemoteStream = {
+            id: remoteStreamId,
+            peerId: destUserPeerId,
+            mediaChannel: mediaConnection,
+            dataChannel: streamControllerConnection,
+            type: 'screen-share',
+        }
+        addToRemoteStreams(remoteStream)
+    }
 }
 
 
@@ -440,6 +482,19 @@ function handleRaiseHand() {
 
 function handleShareScreen() {
     screenIsSharing.value = !screenIsSharing.value
+
+    if(screenIsSharing.value) {
+        // FIX deve dar um jeito de esperar o usuario iniciar o compartilhamento no navegador antes de connectar com os outros usuarios, senão a mediaconnection estará vazia
+        setTimeout(() => {
+            // TODO deve ter um jeito mais facil de pegar a lista de peerIds e excluir o meu peerIdLocal, usando o usePeer composable
+            for (const client of clients.value.values()) {
+                if(client.peerId != user.value.peerId) {// o clinente não sou eu mesmo
+                    console.log('connectToShareScreenWithUser: ', client.peerId, client.peerId == user.value.peerId ? 'EU' : 'REMOTO');
+                    connectToShareScreenWithUser(client.peerId, shareScreenStream.value)
+                }
+            }
+        }, 10000)
+    }
 }
 </script>
 
@@ -472,11 +527,11 @@ function handleShareScreen() {
     inset: 0;
 }
 
-.video-wrapper.video-wrapper--cam .video {
+.video-wrapper.video-wrapper--cam video {
     object-fit: cover;
 }
 
-.video-wrapper.video-wrapper--shared-screen .video {
+.video-wrapper.video-wrapper--shared-screen video {
     object-fit: contain;
 }
 
