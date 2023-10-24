@@ -225,7 +225,7 @@ function connectToNewUser(destUser, localStream) {
     const mediaConnection = call(destUser.peerId, localStream, { remoteStreamType: 'cam' });
 
     // data controller connection
-    const streamControllerConnection = connect(destUser.peerId, { label: 'stream-controller', metadata: { remoteStreamType: 'cam', mediaConnectionId: mediaConnection?.connectionId } })
+    const streamControllerConnection = connect(destUser.peerId, { metadata: { remoteStreamType: 'cam', mediaConnectionId: mediaConnection?.connectionId } })
     if(streamControllerConnection && mediaConnection){
         streamControllerConnection.on('open', () => {
             // receive messages
