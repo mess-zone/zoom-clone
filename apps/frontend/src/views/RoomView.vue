@@ -1,8 +1,8 @@
 <template>
     <div class="page">
         <div class="local-stream-grid">
-            <div class="video-wrapper my-video">
-                <video ref="video" autoplay muted></video>
+            <div class="video-wrapper video-wrapper--cam">
+                <video ref="camVideo" autoplay muted></video>
                 <div class="no-camera">
                     <div
                         class="sound-level"
@@ -26,6 +26,9 @@
                     {{ user?.name }} {{ user?.color }}
                     <font-awesome-icon icon="fa-regular fa-hand" v-if="!!handIsRaised"/>
                 </div>
+            </div>
+            <div class="video-wrapper video-wrapper--shared-screen">
+                <video ref="sharedScreenVideo" autoplay muted></video>
             </div>
         </div>
 
@@ -98,7 +101,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { computed, ref, toRefs } from "vue";
+import { computed, ref, toRefs, watchEffect } from "vue";
 import { useRoute } from "vue-router";
 import { useRoomStore } from '../stores/useRoomStore'
 import { useToasts } from '../composables/useToasts'
@@ -111,6 +114,7 @@ import { usePeer } from "../composables/usePeer";
 import { DataConnection, MediaConnection } from "peerjs";
 import { generateRandomUser } from "../utils/randomUser"
 import { v4 as uuidV4 } from 'uuid'
+import { useDisplayMedia } from '@vueuse/core'
 
 const route = useRoute();
 
@@ -125,7 +129,7 @@ room.active = true
 const connected = computed(() => state.value.connected);
 const size = computed(() => clients.value.size);
 
-const video = ref<HTMLVideoElement>();
+const camVideo = ref<HTMLVideoElement>();
 
 const { 
     stream, 
@@ -134,7 +138,18 @@ const {
     muteCam, 
     muteMic,
     soundLevel,
-} = useLocalStream(video)
+} = useLocalStream(camVideo)
+
+const sharedScreenVideo = ref<HTMLVideoElement>();
+const { stream: shareScreenStream, start } = useDisplayMedia()
+start()
+
+watchEffect(() => {
+  // preview on a video element
+  if(sharedScreenVideo.value && shareScreenStream.value) {
+      sharedScreenVideo.value.srcObject = shareScreenStream.value
+  }
+})
 
 //p2p
 const { open, call, connect, peer, _addMediaConnection, _addDataConnection, _closeAllConnectionsFromUser } = usePeer();
@@ -448,7 +463,14 @@ function handleShareScreen() {
     width: 100%;
     height: 100%;
     inset: 0;
+}
+
+.video-wrapper.video-wrapper--cam .video {
     object-fit: cover;
+}
+
+.video-wrapper.video-wrapper--shared-screen .video {
+    object-fit: contain;
 }
 
 .video-wrapper .top-status-bar {
