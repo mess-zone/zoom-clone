@@ -27,7 +27,7 @@
                     <font-awesome-icon icon="fa-regular fa-hand" v-if="!!handIsRaised"/>
                 </div>
             </div>
-            <div class="video-wrapper video-wrapper--shared-screen">
+            <div v-if="screenIsSharing" class="video-wrapper video-wrapper--shared-screen">
                 <video ref="sharedScreenVideo" autoplay muted></video>
             </div>
         </div>
@@ -141,14 +141,27 @@ const {
 } = useLocalStream(camVideo)
 
 const sharedScreenVideo = ref<HTMLVideoElement>();
-const { stream: shareScreenStream, start } = useDisplayMedia()
-start()
+
+
+const { stream: shareScreenStream, stop, enabled: screenIsSharing } = useDisplayMedia()
 
 watchEffect(() => {
   // preview on a video element
   if(sharedScreenVideo.value && shareScreenStream.value) {
       sharedScreenVideo.value.srcObject = shareScreenStream.value
   }
+  if(shareScreenStream.value) {
+    // nunca é disparado pois o stream já comeca ativado
+    //   shareScreenStream.value.addEventListener('active', (e) => {
+    //     console.log('shared screen active')
+    //   })
+    // garante que o evento de desligar o compartilhamento de tela vai ser disparado, mesmo se o usuário fechar a aba/janela/tela que estava sendo compartilhada
+    shareScreenStream.value.addEventListener('inactive', (e) => {
+        console.log('shared screen inactive', e)
+        stop()
+    })
+  }
+
 })
 
 //p2p
@@ -425,14 +438,8 @@ function handleRaiseHand() {
     sendToAllRemoteStreams(payload)
 }
 
-const screenIsSharing = ref(false)
-
 function handleShareScreen() {
     screenIsSharing.value = !screenIsSharing.value
-
-    // send messages
-    const payload = { event: (screenIsSharing.value ? 'share-screen-start' : 'share-screen-stop'), data: {} }
-    sendToAllRemoteStreams(payload)
 }
 </script>
 
