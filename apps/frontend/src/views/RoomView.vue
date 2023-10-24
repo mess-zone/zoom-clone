@@ -222,6 +222,10 @@ if(peer.value) {
         dataConnection.on('open', () => {
             // receive messages
             dataConnection.on('data', (event) => handleStreamControllerEvents(event, dataConnection.metadata.remoteStreamId))
+
+            // send messages
+            console.log('sendind UPDATE-USER-INFO data', { event: 'updated-user-info', data: {...user.value} })
+            dataConnection.send({ event: 'updated-user-info', data: {...user.value} })
         })
 
         // add remote stream to array of remote streams
