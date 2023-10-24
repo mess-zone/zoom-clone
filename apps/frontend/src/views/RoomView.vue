@@ -24,7 +24,14 @@
         </div>
 
         <div id="streamGrid">
-            <StreamPreview v-for="item in mediaChannels" :key="item.connectionId" :id="item.connectionId" :mediaConnection="(item as MediaConnection)" :remoteStream="item.remoteStream" :localPeerId="user.peerId"></StreamPreview>
+            <StreamPreview 
+                v-for="item in mediaChannels" 
+                :key="item.connectionId" 
+                :id="item.connectionId" 
+                :mediaConnection="(item as MediaConnection)" 
+                :remoteStream="item.remoteStream" 
+                :localPeerId="user.peerId"
+            ></StreamPreview>
         </div>
 
         <div class="footer-bar">
@@ -94,7 +101,7 @@ import SettingsModal from "../components/organisms/SettingsModal.vue";
 import ToastContainer from "../components/molecules/ToastContainer.vue";
 import StreamPreview from "../components/molecules/StreamPreview.vue";
 import { usePeer } from "../composables/usePeer";
-import { MediaConnection } from "peerjs";
+import { DataConnection, MediaConnection } from "peerjs";
 import { generateRandomUser } from "../utils/randomUser"
 
 const route = useRoute();
@@ -189,6 +196,15 @@ room.socket.on("user-disconnected", (userId) => {
 });
 
 
+interface RemoteStream {
+    id: string, // mediaChannel connectionId
+    peerId: string,
+    mediaChannel: MediaConnection,
+    dataChannel: DataConnection,
+    type: 'cam',
+}
+
+
 function handleStreamControllerEvents(event, mediaStreamConnectionId) {
     console.log(`[stream-controller] media stream ${mediaStreamConnectionId} received event:`, event)
     switch(event.event) {
@@ -204,12 +220,13 @@ function handleStreamControllerEvents(event, mediaStreamConnectionId) {
  * @param localStream 
  */
 function connectToNewUser(destUser, localStream) {
+
     // call destination peer
     const mediaConnection = call(destUser.peerId, localStream);
 
     // data controller connection
     const streamControllerConnection = connect(destUser.peerId, { label: 'stream-controller', metadata: { mediaConnectionId: mediaConnection?.connectionId } })
-    if(streamControllerConnection){
+    if(streamControllerConnection && mediaConnection){
         streamControllerConnection.on('open', () => {
             // receive messages
             streamControllerConnection.on('data', (event) => handleStreamControllerEvents(event, mediaConnection?.connectionId))
@@ -218,7 +235,18 @@ function connectToNewUser(destUser, localStream) {
             console.log('sendind UPDATE-USER-INFO data', { event: 'updated-user-info', data: {...user.value} })
             streamControllerConnection.send({ event: 'updated-user-info', data: {...user.value} })
         })
+
+
+        const remoteStream: RemoteStream = {
+            id: mediaConnection.connectionId,
+            peerId: destUser.peerId,
+            mediaChannel: mediaConnection,
+            dataChannel: streamControllerConnection,
+            type: 'cam',
+        }
+        console.log('CREATED REMOTE STREAM', remoteStream)
     }
+
 }
 
 
