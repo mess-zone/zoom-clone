@@ -2,7 +2,7 @@
     <div class="stream-preview">
         <video ref="video" autoplay muted></video>
         <div class="bottom-bar">
-            {{ remoteStream.user?.name }} {{ remoteStream.user?.color }}
+            [{{ `${remoteStream.type}` }}] {{ remoteStream.user?.name }} {{ remoteStream.user?.color }}
             <font-awesome-icon icon="fa-regular fa-hand" v-if="!!remoteStream.raisedHand"/>
         </div>
     </div>
@@ -19,6 +19,7 @@ interface RemoteStream {
     mediaChannel: MediaConnection | null,
     dataChannel: DataConnection | null,
     type: 'cam' | 'screen-share',
+    visible: boolean,
 
     user?: {
         name: string,

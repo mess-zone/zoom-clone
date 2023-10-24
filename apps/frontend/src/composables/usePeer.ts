@@ -43,7 +43,7 @@ export function usePeer() {
     /**
      * Abrir media connection
     */
-    function call(destPeerId: string, localStream: MediaStream, metadata?: Object) {
+    function call(destPeerId: string, localStream: MediaStream, metadata?: any) {
         console.log(`[peer] calling the remote peer ${destPeerId}`, metadata);
         const mediaConnection = peer.value?.call(destPeerId, localStream, { metadata })
         _addMediaConnection(mediaConnection)

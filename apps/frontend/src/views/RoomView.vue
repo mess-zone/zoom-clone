@@ -23,18 +23,21 @@
                     </div>
                 </div>
                 <div class="bottom-bar">
-                    {{ user?.name }} {{ user?.color }}
+                    You [cam] {{ user?.name }} {{ user?.color }}
                     <font-awesome-icon icon="fa-regular fa-hand" v-if="!!handIsRaised"/>
                 </div>
             </div>
             <div v-if="screenIsSharing" class="video-wrapper video-wrapper--shared-screen">
                 <video ref="sharedScreenVideo" autoplay muted></video>
+                <div class="bottom-bar">
+                    You [screen-share] {{ user?.name }} {{ user?.color }}
+                </div>
             </div>
         </div>
 
         <div id="streamGrid">
             <StreamPreview 
-                v-for="item in remoteStreams" 
+                v-for="item in visibleRemoteStreams" 
                 :key="item.id"
                 :remoteStream="(item as RemoteStream)"
                 :mediaStream="(item.mediaChannel?.remoteStream as MediaStream)"
@@ -190,6 +193,7 @@ interface RemoteStream {
     mediaChannel: MediaConnection | null,
     dataChannel: DataConnection | null,
     type: 'cam' | 'screen-share',
+    visible: boolean,
 
     user?: {
         name: string,
@@ -199,6 +203,10 @@ interface RemoteStream {
 }
 
 const remoteStreams = ref<RemoteStream[]>([])
+
+const visibleRemoteStreams = computed(() => {
+    return remoteStreams.value.filter(s => s.visible)
+})
 
 function addToRemoteStreams(stream: RemoteStream) {
     const foundStream = remoteStreams.value.find(s => s.id == stream.id)
@@ -263,13 +271,16 @@ if(peer.value) {
     
     // se algum peer me liga, o evento call é acionado
     peer.value.on("call", (mediaConnection) => {
-        console.log('CHEGOU A REQUISIÇÃO DE COMPARTILHAR A TELA?', mediaConnection)
         _addMediaConnection(mediaConnection)
+
+        let visible = false
 
         if(mediaConnection.metadata.remoteStreamType === 'cam') {
             mediaConnection.answer(camStream.value);
+            visible = true
         } else if(mediaConnection.metadata.remoteStreamType === 'screen-share') {
             mediaConnection.answer();
+            visible = true
         }
 
         // add remote stream to array of remote streams
@@ -279,21 +290,27 @@ if(peer.value) {
             mediaChannel: mediaConnection,
             dataChannel: null,
             type: mediaConnection.metadata.remoteStreamType,
+            visible,
         }
         addToRemoteStreams(remoteStream)
     });
 
     peer.value.on("connection", (dataConnection) => {
         _addDataConnection(dataConnection)
+        let visible = false
         dataConnection.on('open', () => {
             // receive messages
             dataConnection.on('data', (event) => handleStreamControllerEvents(event, dataConnection.metadata.remoteStreamId))
+
 
             if(dataConnection.metadata.remoteStreamType === 'cam') {
                 // send messages
                 const payload = { event: 'updated-user-info', data: { user: user.value, raisedHand: handIsRaised.value} }
                 console.log('sendind UPDATE-USER-INFO data', payload)
                 sendDataToRemoteStream(dataConnection.metadata.remoteStreamId, payload)
+                visible = true
+            } else if(dataConnection.metadata.remoteStreamType === 'screen-share') {
+                visible = false
             }
         })
 
@@ -304,6 +321,7 @@ if(peer.value) {
             mediaChannel: null,
             dataChannel: dataConnection,
             type: dataConnection.metadata.remoteStreamType,
+            visible,
         }
         addToRemoteStreams(remoteStream)
     })
@@ -380,6 +398,8 @@ function connectToNewUser(destUserPeerId, localCamStream) {
 
     // call destination peer
     const mediaConnection = call(destUserPeerId, localCamStream, metadata);
+    console.log('EU TO LIGANDO PRA COMPARTILHAR A CAMERA?', mediaConnection)
+
 
     // data controller connection
     const streamControllerConnection = connect(destUserPeerId, { metadata })
@@ -403,6 +423,7 @@ function connectToNewUser(destUserPeerId, localCamStream) {
             mediaChannel: mediaConnection,
             dataChannel: streamControllerConnection,
             type: 'cam',
+            visible: true,
         }
         addToRemoteStreams(remoteStream)
     }
@@ -419,7 +440,7 @@ function connectToShareScreenWithUser(destUserPeerId, localSharedScreemStream) {
 
     // call destination peer
     const mediaConnection = call(destUserPeerId, localSharedScreemStream, metadata);
-    console.log('EU TO LIGANDO PRA COMPARTILHAR A TELA?', mediaConnection)
+    console.log('EU TO LIGANDO PRA COMPARTILHAR A TELA?', mediaConnection?.remoteStream)
 
     // data controller connection
     const streamControllerConnection = connect(destUserPeerId, { metadata })
@@ -435,13 +456,15 @@ function connectToShareScreenWithUser(destUserPeerId, localSharedScreemStream) {
 
 
 
-        // add remote stream to array of remote streams
+
+        // add remote stream to array of remote streams, mas com a visibilidade desativada
         const remoteStream: RemoteStream = {
             id: remoteStreamId,
             peerId: destUserPeerId,
             mediaChannel: mediaConnection,
             dataChannel: streamControllerConnection,
             type: 'screen-share',
+            visible: false,
         }
         addToRemoteStreams(remoteStream)
     }
