@@ -1,24 +1,30 @@
 <template>
     <div class="page">
-        <div class="video-wrapper my-video">
-            <video ref="video" autoplay muted></video>
-            <div class="no-camera">
-                <div
-                    class="sound-level"
-                    :style="{ borderWidth: soundLevel + 'px' }"
-                ></div>
-            </div>
-            <div class="status-bar">
-                {{ soundLevel }}
-                <div class="mic-status">
-                    <font-awesome-icon
-                        v-show="micIsEnabled"
-                        icon="fa-solid fa-microphone"
-                    />
-                    <font-awesome-icon
-                        v-show="!micIsEnabled"
-                        icon="fa-solid fa-microphone-slash"
-                    />
+        <div class="local-stream-grid">
+            <div class="video-wrapper my-video">
+                <video ref="video" autoplay muted></video>
+                <div class="no-camera">
+                    <div
+                        class="sound-level"
+                        :style="{ borderWidth: soundLevel + 'px' }"
+                    ></div>
+                </div>
+                <div class="top-status-bar">
+                    {{ soundLevel }}
+                    <div class="mic-status">
+                        <font-awesome-icon
+                            v-show="micIsEnabled"
+                            icon="fa-solid fa-microphone"
+                        />
+                        <font-awesome-icon
+                            v-show="!micIsEnabled"
+                            icon="fa-solid fa-microphone-slash"
+                        />
+                    </div>
+                </div>
+                <div class="bottom-bar">
+                    {{ user?.name }} {{ user?.color }}
+                    <font-awesome-icon icon="fa-regular fa-hand" v-if="!!handIsRaised"/>
                 </div>
             </div>
         </div>
@@ -432,7 +438,7 @@ function handleRaiseHand() {
     object-fit: cover;
 }
 
-.video-wrapper .status-bar {
+.video-wrapper .top-status-bar {
     background-color: rgba(0, 0, 0, 0.6);
     position: absolute;
     top: 0;
@@ -441,7 +447,16 @@ function handleRaiseHand() {
     color: white;
 }
 
-.status-bar .mic-status {
+.video-wrapper .bottom-bar {
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 8px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    color: white;
+}
+
+.top-status-bar .mic-status {
     width: 32px;
     display: flex;
     justify-content: center;
@@ -538,7 +553,7 @@ function handleRaiseHand() {
 
 
 #streamGrid {
-    background-color: pink;
+  background-color: pink;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -558,6 +573,18 @@ function handleRaiseHand() {
   border-radius: 15px;
   overflow: hidden;
   object-fit: cover;
+}
+
+.local-stream-grid {
+    background-color: aqua;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
 }
 
 

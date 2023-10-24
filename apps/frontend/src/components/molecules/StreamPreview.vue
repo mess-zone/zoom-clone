@@ -1,7 +1,7 @@
 <template>
     <div class="stream-preview">
         <video ref="video" autoplay muted></video>
-        <div class="front">
+        <div class="bottom-bar">
             {{ remoteStream.user?.name }} {{ remoteStream.user?.color }}
             <font-awesome-icon icon="fa-regular fa-hand" v-if="!!remoteStream.raisedHand"/>
         </div>
@@ -32,6 +32,8 @@ const props = defineProps<{
     // FIX o video só é exibido se passar o mediaStream separado como prop, tem algo errado com a reatividade do remoteStream prop
     mediaStream: MediaStream,
 }>()
+
+// TODO show mic and cam status
 
 const video = ref<HTMLVideoElement>()
 
@@ -64,7 +66,7 @@ watchEffect(() => {
     object-fit: cover;
 }
 
-.front {
+.bottom-bar {
     background-color: rgba(0, 0, 0, 0.6);
     padding: 8px;
     position: absolute;
