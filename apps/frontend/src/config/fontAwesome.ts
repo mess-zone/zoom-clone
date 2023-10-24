@@ -13,6 +13,7 @@ import {
     faEllipsisVertical,
     faXmark,
     faPhone,
+    faTv,
 } from "@fortawesome/free-solid-svg-icons";
 
 import {
@@ -29,6 +30,7 @@ library.add(
     faXmark,
     faPhone,
     faHand,
+    faTv,
 );
 
 

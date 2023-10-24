@@ -79,6 +79,9 @@
                 <button class="btn-round" :class="{ 'active': handIsRaised }" @click="handleRaiseHand" :title="handIsRaised ? 'Stop raise hand': 'Raise hand'">
                     <font-awesome-icon icon="fa-regular fa-hand" />
                 </button>
+                <button class="btn-round" :class="{ 'active': screenIsSharing }" @click="handleShareScreen" :title="screenIsSharing ? 'Stop sharing screen': 'Start share screen'">
+                    <font-awesome-icon :icon="['fas', 'tv']" />
+                </button>
                 <button class="btn-round" @click="openSettingsModal" title="More options">
                     <font-awesome-icon icon="fa-solid fa-ellipsis-vertical" />
                 </button>
@@ -404,6 +407,16 @@ function handleRaiseHand() {
 
     // send messages
     const payload = { event: (handIsRaised.value ? 'hand-up' : 'hand-down'), data: {} }
+    sendToAllRemoteStreams(payload)
+}
+
+const screenIsSharing = ref(false)
+
+function handleShareScreen() {
+    screenIsSharing.value = !screenIsSharing.value
+
+    // send messages
+    const payload = { event: (screenIsSharing.value ? 'share-screen-start' : 'share-screen-stop'), data: {} }
     sendToAllRemoteStreams(payload)
 }
 </script>
