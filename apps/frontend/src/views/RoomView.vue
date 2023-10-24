@@ -130,7 +130,7 @@ const {
 } = useLocalStream(video)
 
 //p2p
-const { open, destroy, call, connect, peer, channels, _addMediaConnection, _addDataConnection, _closeAllConnectionsFromUser } = usePeer();
+const { open, call, connect, peer, channels, _addMediaConnection, _addDataConnection, _closeAllConnectionsFromUser } = usePeer();
 
 const mediaChannels = computed(() => {
     return channels.value.filter(c => c.type == 'media') as MediaConnection[]
@@ -174,6 +174,18 @@ function addToRemoteStreams(stream: RemoteStream) {
         }
     } else {
         remoteStreams.value.push(stream)
+    }
+}
+
+function removeFromRemoteStreams(remoteStream: RemoteStream) {
+    const index = remoteStreams.value.indexOf(remoteStream);
+    remoteStreams.value.splice(index, 1);
+}
+
+function removeAllRemoteStreamsByUser(peerId: string) {
+    const streamsToRemove = remoteStreams.value.filter(s => s.peerId == peerId)
+    for(const remoteStream of streamsToRemove) {
+        removeFromRemoteStreams(remoteStream as RemoteStream)
     }
 }
 
@@ -238,6 +250,7 @@ room.socket.on("user-disconnected", (userId) => {
     console.log(`[socket] remote user ${userId} leaved the room`);
     clients.value.delete(userId)
     addToast({ message: `${userId} saiu da reunião`})
+    removeAllRemoteStreamsByUser(userId)
     _closeAllConnectionsFromUser(userId)
 });
 
@@ -310,10 +323,13 @@ function closeSettingsModal() {
     settingsModalIsOpen.value = false
 }
 
-// TODO reset room when leaving?
 function handleLeaveRoom() {
-    // TODO shoulD end all conections from user, not destroy peer
-    destroy() 
+    removeAllRemoteStreamsByUser(userId.value)
+    _closeAllConnectionsFromUser(userId.value)
+    // TODO should destroy peer?
+    // destroy() 
+    
+    // TODO shoud reset room data when leaving
     room.leaveRoom(userId)
     room.active = false
 }
