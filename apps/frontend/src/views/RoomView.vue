@@ -204,10 +204,11 @@ function handleStreamControllerEvents(event) {
  * @param localStream 
  */
 function connectToNewUser(destUser, localStream) {
-    const users = [destUser, {...user.value}]
-    
+    // call destination peer
+    const mediaConnection = call(destUser.peerId, localStream);
+
     // data controller connection
-    const streamControllerConnection = connect(destUser.peerId, { label: 'stream-controller' })
+    const streamControllerConnection = connect(destUser.peerId, { label: 'stream-controller', metadata: { mediaConnectionId: mediaConnection?.connectionId } })
     if(streamControllerConnection){
         streamControllerConnection.on('open', () => {
             // receive messages
@@ -218,9 +219,6 @@ function connectToNewUser(destUser, localStream) {
             streamControllerConnection.send({ event: 'updated-user-info', data: {...user.value} })
         })
     }
-
-    // call destination peer
-    call(destUser.peerId, localStream, { users });
 }
 
 

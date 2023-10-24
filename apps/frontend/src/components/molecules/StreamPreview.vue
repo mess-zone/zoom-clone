@@ -2,7 +2,7 @@
     <div class="stream-preview">
         <video ref="video" autoplay muted></video>
         <div class="front">
-            {{ remoteUser.name }} {{ remoteUser.color }}
+            {{ remoteUser?.name }} {{ remoteUser?.color }}
         </div>
     </div>
 </template>
@@ -19,7 +19,7 @@ const props = defineProps<{
 
 const video = ref<HTMLVideoElement>()
 
-const metadata = ref(props.mediaConnection?.metadata)
+// const metadata = ref(props.mediaConnection?.metadata)
 
 const remoteUser = ref()
 
@@ -28,9 +28,9 @@ watchEffect(() => {
         video.value.srcObject = props.remoteStream
     }
 
-    if(props.localPeerId) {
-        remoteUser.value = metadata.value.users.find(u => u.peerId !== props.localPeerId)
-    }
+    // if(props.localPeerId) {
+    //     remoteUser.value = metadata.value.users.find(u => u.peerId !== props.localPeerId)
+    // }
 })
 
 

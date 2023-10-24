@@ -43,7 +43,7 @@ export function usePeer() {
     /**
      * Abrir media connection
     */
-    function call(destPeerId: string, localStream: MediaStream, metadata: Object) {
+    function call(destPeerId: string, localStream: MediaStream, metadata?: Object) {
         console.log(`[peer] calling the remote peer ${destPeerId}`, metadata);
         const mediaConnection = peer.value?.call(destPeerId, localStream, { metadata })
         _addMediaConnection(mediaConnection)
@@ -54,7 +54,7 @@ export function usePeer() {
     /*
     Abrir data connection
     */
-    function connect(destPeerId: string, options: { label?: string, metadata?: Object }) {
+    function connect(destPeerId: string, options?: { label?: string, metadata?: Object }) {
         console.log(`[peer] open remote peer ${destPeerId} data connection`);
         const dataConnection = peer.value?.connect(destPeerId, options);
         _addDataConnection(dataConnection)
