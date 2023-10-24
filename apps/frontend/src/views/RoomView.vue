@@ -153,6 +153,10 @@ interface RemoteStream {
     mediaChannel: MediaConnection | null,
     dataChannel: DataConnection | null,
     type: 'cam',
+    user?: {
+        name: string,
+        color: string,
+    }
 }
 
 const remoteStreams = ref<RemoteStream[]>([])
@@ -217,7 +221,7 @@ if(peer.value) {
         _addDataConnection(dataConnection)
         dataConnection.on('open', () => {
             // receive messages
-            dataConnection.on('data', (event) => handleStreamControllerEvents(event, dataConnection.connectionId))
+            dataConnection.on('data', (event) => handleStreamControllerEvents(event, dataConnection.metadata.remoteStreamId))
         })
 
         // add remote stream to array of remote streams
@@ -250,14 +254,20 @@ room.socket.on("user-disconnected", (userId) => {
 });
 
 
+function updateUserInfo(data, remoteStreamId) {
+    const remoteStream = remoteStreams.value.find(remoteStream => remoteStream.id == remoteStreamId)
+    if(remoteStream) {
+        remoteStream.user = data
+        console.log('UPDATED USER INFO', data, remoteStreamId, remoteStream)
+    }
+}
 
 
-
-function handleStreamControllerEvents(event, mediaStreamConnectionId) {
-    console.log(`[stream-controller] media stream ${mediaStreamConnectionId} received event:`, event)
+function handleStreamControllerEvents(event, remoteStreamId) {
+    console.log(`[stream-controller] media stream ${remoteStreamId} received event:`, event)
     switch(event.event) {
         case 'updated-user-info':
-            console.log('UPDATED USER INFO')
+            updateUserInfo(event.data, remoteStreamId)
             break
     }
 }
@@ -284,7 +294,7 @@ function connectToNewUser(destUser, localStream) {
     if(streamControllerConnection && mediaConnection){
         streamControllerConnection.on('open', () => {
             // receive messages
-            streamControllerConnection.on('data', (event) => handleStreamControllerEvents(event, mediaConnection?.connectionId))
+            streamControllerConnection.on('data', (event) => handleStreamControllerEvents(event, remoteStreamId))
     
             // send messages
             console.log('sendind UPDATE-USER-INFO data', { event: 'updated-user-info', data: {...user.value} })

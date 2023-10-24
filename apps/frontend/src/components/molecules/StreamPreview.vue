@@ -2,7 +2,7 @@
     <div class="stream-preview">
         <video ref="video" autoplay muted></video>
         <div class="front">
-            {{ remoteUser?.name }} {{ remoteUser?.color }}
+            {{ remoteStream.user?.name }} {{ remoteStream.user?.color }}
         </div>
     </div>
 </template>
@@ -11,12 +11,17 @@
 import { DataConnection, MediaConnection } from 'peerjs';
 import { ref, watchEffect } from 'vue';
 
+// TODO duplicated definition
 interface RemoteStream {
     id: string,
     peerId: string,
     mediaChannel: MediaConnection | null,
     dataChannel: DataConnection | null,
     type: 'cam',
+    user?: {
+        name: string,
+        color: string,
+    }
 }
 
 const props = defineProps<{
@@ -27,8 +32,6 @@ const props = defineProps<{
 
 const video = ref<HTMLVideoElement>()
 
-
-const remoteUser = ref()
 
 watchEffect(() => {
     if(video.value) {
