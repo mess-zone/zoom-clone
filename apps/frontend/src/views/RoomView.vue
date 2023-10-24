@@ -188,6 +188,17 @@ function removeAllRemoteStreamsByUser(peerId: string) {
     }
 }
 
+function getRemoteStream(remoteStreamId: string) {
+    return remoteStreams.value.find(s => s.id == remoteStreamId)
+}
+
+function sendDataToRemoteStream(remoteStreamId: string, payload) {
+    const remoteStream = getRemoteStream(remoteStreamId)
+    if(remoteStream?.dataChannel) {
+        remoteStream.dataChannel.send(payload)
+    }
+}
+
 if(peer.value) {
     // when my peer object is created, join the socket room
     peer.value.on("open", (id) => {
@@ -224,8 +235,9 @@ if(peer.value) {
             dataConnection.on('data', (event) => handleStreamControllerEvents(event, dataConnection.metadata.remoteStreamId))
 
             // send messages
-            console.log('sendind UPDATE-USER-INFO data', { event: 'updated-user-info', data: {...user.value} })
-            dataConnection.send({ event: 'updated-user-info', data: {...user.value} })
+            const payload = { event: 'updated-user-info', data: {...user.value} }
+            console.log('sendind UPDATE-USER-INFO data', payload)
+            sendDataToRemoteStream(dataConnection.metadata.remoteStreamId, payload)
         })
 
         // add remote stream to array of remote streams
@@ -266,12 +278,34 @@ function updateUserInfo(data, remoteStreamId) {
     }
 }
 
+function handUp(data, remoteStreamId) {
+    const remoteStream = remoteStreams.value.find(remoteStream => remoteStream.id == remoteStreamId)
+    if(remoteStream) {
+        remoteStream.user = data
+        console.log('HAND UP', data, remoteStreamId, remoteStream)
+    }
+}
+
+function handDown(data, remoteStreamId) {
+    const remoteStream = remoteStreams.value.find(remoteStream => remoteStream.id == remoteStreamId)
+    if(remoteStream) {
+        remoteStream.user = data
+        console.log('HAND DOWN', data, remoteStreamId, remoteStream)
+    }
+}
+
 
 function handleStreamControllerEvents(event, remoteStreamId) {
     console.log(`[stream-controller] media stream ${remoteStreamId} received event:`, event)
     switch(event.event) {
         case 'updated-user-info':
             updateUserInfo(event.data, remoteStreamId)
+            break
+        case 'hand-up':
+            handUp(event.data, remoteStreamId)
+            break
+        case 'hand-down':
+            handDown(event.data, remoteStreamId)
             break
     }
 }
@@ -301,8 +335,10 @@ function connectToNewUser(destUser, localStream) {
             streamControllerConnection.on('data', (event) => handleStreamControllerEvents(event, remoteStreamId))
     
             // send messages
-            console.log('sendind UPDATE-USER-INFO data', { event: 'updated-user-info', data: {...user.value} })
-            streamControllerConnection.send({ event: 'updated-user-info', data: {...user.value} })
+            const payload = { event: 'updated-user-info', data: {...user.value} }
+            console.log('sendind UPDATE-USER-INFO data', payload)
+            sendDataToRemoteStream(remoteStreamId, payload)
+            // streamControllerConnection.send({ event: 'updated-user-info', data: {...user.value} })
         })
 
 
@@ -347,6 +383,10 @@ const handIsRaised = ref(false)
 
 function handleRaiseHand() {
     handIsRaised.value = !handIsRaised.value
+
+    // send messages
+    console.log('sending HAND UP data', { event: 'hand-up', data: {} })
+    // dataConnection.send({ event: 'updated-user-info', data: {...user.value} })
 }
 </script>
 
