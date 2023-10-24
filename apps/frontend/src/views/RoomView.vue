@@ -246,7 +246,7 @@ if(peer.value) {
             dataConnection.on('data', (event) => handleStreamControllerEvents(event, dataConnection.metadata.remoteStreamId))
 
             // send messages
-            const payload = { event: 'updated-user-info', data: {...user.value} }
+            const payload = { event: 'updated-user-info', data: { user: user.value, raisedHand: handIsRaised.value} }
             console.log('sendind UPDATE-USER-INFO data', payload)
             sendDataToRemoteStream(dataConnection.metadata.remoteStreamId, payload)
         })
@@ -284,7 +284,8 @@ room.socket.on("user-disconnected", (userId) => {
 function updateUserInfo(data, remoteStreamId) {
     const remoteStream = remoteStreams.value.find(remoteStream => remoteStream.id == remoteStreamId)
     if(remoteStream) {
-        remoteStream.user = data
+        remoteStream.user = data.user
+        remoteStream.raisedHand = data.raisedHand
         console.log('UPDATED USER INFO', data, remoteStreamId, remoteStream)
     }
 }
@@ -346,7 +347,7 @@ function connectToNewUser(destUser, localStream) {
             streamControllerConnection.on('data', (event) => handleStreamControllerEvents(event, remoteStreamId))
     
             // send messages
-            const payload = { event: 'updated-user-info', data: {...user.value} }
+            const payload = { event: 'updated-user-info', data: { user: user.value, raisedHand: handIsRaised.value } }
             console.log('sendind UPDATE-USER-INFO data', payload)
             sendDataToRemoteStream(remoteStreamId, payload)
             // streamControllerConnection.send({ event: 'updated-user-info', data: {...user.value} })
