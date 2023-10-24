@@ -9,24 +9,8 @@
 </template>
 
 <script setup lang="ts">
-import { DataConnection, MediaConnection } from 'peerjs';
 import { ref, watchEffect } from 'vue';
-
-// TODO duplicated definition
-interface RemoteStream {
-    id: string,
-    peerId: string,
-    mediaChannel: MediaConnection | null,
-    dataChannel: DataConnection | null,
-    type: 'cam' | 'screen-share',
-    visible: boolean,
-
-    user?: {
-        name: string,
-        color: string,
-    },
-    raisedHand: boolean,
-}
+import { RemoteStream } from '../../utils/temporary-types';
 
 const props = defineProps<{
     remoteStream: RemoteStream,

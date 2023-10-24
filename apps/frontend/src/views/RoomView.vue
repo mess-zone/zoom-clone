@@ -114,10 +114,10 @@ import SettingsModal from "../components/organisms/SettingsModal.vue";
 import ToastContainer from "../components/molecules/ToastContainer.vue";
 import StreamPreview from "../components/molecules/StreamPreview.vue";
 import { usePeer } from "../composables/usePeer";
-import { DataConnection, MediaConnection } from "peerjs";
 import { generateRandomUser } from "../utils/randomUser"
 import { v4 as uuidV4 } from 'uuid'
 import { useDisplayMedia } from '@vueuse/core'
+import { RemoteStream } from "../utils/temporary-types";
 
 const route = useRoute();
 
@@ -185,22 +185,6 @@ const user = ref<User>({
 })
 
 open()
-
-// TODO duplicated definition
-interface RemoteStream {
-    id: string,
-    peerId: string,
-    mediaChannel: MediaConnection | null,
-    dataChannel: DataConnection | null,
-    type: 'cam' | 'screen-share',
-    visible: boolean,
-
-    user?: {
-        name: string,
-        color: string,
-    },
-    raisedHand?: boolean,
-}
 
 const remoteStreams = ref<RemoteStream[]>([])
 
