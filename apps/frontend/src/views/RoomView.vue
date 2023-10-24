@@ -151,6 +151,31 @@ const user = ref<User>({
 
 open()
 
+interface RemoteStream {
+    id: string, // mediaChannel connectionId
+    peerId: string,
+    mediaChannel: MediaConnection | null,
+    dataChannel: DataConnection | null,
+    type: 'cam',
+}
+
+const remoteStreams = ref<RemoteStream[]>([])
+
+function addToRemoteStreams(stream: RemoteStream) {
+    const foundStream = remoteStreams.value.find(s => s.id == stream.id)
+    // patch update 
+    if(foundStream) { 
+        if(stream.dataChannel) {
+            foundStream.dataChannel = stream.dataChannel
+        }
+        if(stream.mediaChannel) {
+            foundStream.mediaChannel = stream.mediaChannel
+        }
+    } else {
+        remoteStreams.value.push(stream)
+    }
+}
+
 if(peer.value) {
     // when my peer object is created, join the socket room
     peer.value.on("open", (id) => {
@@ -168,6 +193,16 @@ if(peer.value) {
     peer.value.on("call", (mediaConnection) => {
         _addMediaConnection(mediaConnection)
         mediaConnection.answer(stream.value);
+
+        // add remote stream to array of remote streams
+        const remoteStream: RemoteStream = {
+            id: mediaConnection.connectionId,
+            peerId: mediaConnection.peer,
+            mediaChannel: mediaConnection,
+            dataChannel: null,
+            type: 'cam',
+        }
+        addToRemoteStreams(remoteStream)
     });
 
     peer.value.on("connection", (dataConnection) => {
@@ -176,6 +211,16 @@ if(peer.value) {
             // receive messages
             dataConnection.on('data', (event) => handleStreamControllerEvents(event, dataConnection.connectionId))
         })
+
+        // add remote stream to array of remote streams
+        const remoteStream: RemoteStream = {
+            id: dataConnection.metadata.mediaConnectionId,
+            peerId: dataConnection.peer,
+            mediaChannel: null,
+            dataChannel: dataConnection,
+            type: 'cam',
+        }
+        addToRemoteStreams(remoteStream)
     })
 
 }
@@ -196,13 +241,7 @@ room.socket.on("user-disconnected", (userId) => {
 });
 
 
-interface RemoteStream {
-    id: string, // mediaChannel connectionId
-    peerId: string,
-    mediaChannel: MediaConnection,
-    dataChannel: DataConnection,
-    type: 'cam',
-}
+
 
 
 function handleStreamControllerEvents(event, mediaStreamConnectionId) {
@@ -237,6 +276,8 @@ function connectToNewUser(destUser, localStream) {
         })
 
 
+
+        // add remote stream to array of remote streams
         const remoteStream: RemoteStream = {
             id: mediaConnection.connectionId,
             peerId: destUser.peerId,
@@ -244,7 +285,7 @@ function connectToNewUser(destUser, localStream) {
             dataChannel: streamControllerConnection,
             type: 'cam',
         }
-        console.log('CREATED REMOTE STREAM', remoteStream)
+        addToRemoteStreams(remoteStream)
     }
 
 }
