@@ -153,10 +153,12 @@ interface RemoteStream {
     mediaChannel: MediaConnection | null,
     dataChannel: DataConnection | null,
     type: 'cam',
+
     user?: {
         name: string,
         color: string,
-    }
+    },
+    raisedHand?: boolean,
 }
 
 const remoteStreams = ref<RemoteStream[]>([])
@@ -200,8 +202,11 @@ function sendDataToRemoteStream(remoteStreamId: string, payload) {
 }
 
 function sendToAllRemoteStreams(payload) {
+    console.log('BROADCAST DATA TO ALL', payload)
     for(const remoteStream of remoteStreams.value) {
-        console.log('BROADCAST DATA TO ALL', remoteStream, payload)
+        if(remoteStream.dataChannel) {
+            remoteStream.dataChannel.send(payload)
+        }
     }
 }
 
@@ -287,7 +292,7 @@ function updateUserInfo(data, remoteStreamId) {
 function handUp(data, remoteStreamId) {
     const remoteStream = remoteStreams.value.find(remoteStream => remoteStream.id == remoteStreamId)
     if(remoteStream) {
-        remoteStream.user = data
+        remoteStream.raisedHand = true
         console.log('HAND UP', data, remoteStreamId, remoteStream)
     }
 }
@@ -295,7 +300,7 @@ function handUp(data, remoteStreamId) {
 function handDown(data, remoteStreamId) {
     const remoteStream = remoteStreams.value.find(remoteStream => remoteStream.id == remoteStreamId)
     if(remoteStream) {
-        remoteStream.user = data
+        remoteStream.raisedHand = false
         console.log('HAND DOWN', data, remoteStreamId, remoteStream)
     }
 }
@@ -391,7 +396,7 @@ function handleRaiseHand() {
     handIsRaised.value = !handIsRaised.value
 
     // send messages
-    const payload = { event: 'hand-up', data: {} }
+    const payload = { event: (handIsRaised.value ? 'hand-up' : 'hand-down'), data: {} }
     sendToAllRemoteStreams(payload)
 }
 </script>

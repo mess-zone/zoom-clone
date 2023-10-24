@@ -2,7 +2,7 @@
     <div class="stream-preview">
         <video ref="video" autoplay muted></video>
         <div class="front">
-            {{ remoteStream.user?.name }} {{ remoteStream.user?.color }}
+            {{ remoteStream.user?.name }} {{ remoteStream.user?.color }} raised hand: {{ !!remoteStream.raisedHand }}
         </div>
     </div>
 </template>
@@ -18,10 +18,12 @@ interface RemoteStream {
     mediaChannel: MediaConnection | null,
     dataChannel: DataConnection | null,
     type: 'cam',
+
     user?: {
         name: string,
         color: string,
-    }
+    },
+    raisedHand: boolean,
 }
 
 const props = defineProps<{
