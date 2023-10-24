@@ -167,7 +167,7 @@ if(peer.value) {
         _addDataConnection(dataConnection)
         dataConnection.on('open', () => {
             // receive messages
-            dataConnection.on('data', handleStreamControllerEvents)
+            dataConnection.on('data', (event) => handleStreamControllerEvents(event, dataConnection.connectionId))
         })
     })
 
@@ -189,8 +189,8 @@ room.socket.on("user-disconnected", (userId) => {
 });
 
 
-function handleStreamControllerEvents(event) {
-    console.log('[stream-controller] received event:', event)
+function handleStreamControllerEvents(event, mediaStreamConnectionId) {
+    console.log(`[stream-controller] media stream ${mediaStreamConnectionId} received event:`, event)
     switch(event.event) {
         case 'updated-user-info':
             console.log('UPDATED USER INFO')
@@ -212,7 +212,7 @@ function connectToNewUser(destUser, localStream) {
     if(streamControllerConnection){
         streamControllerConnection.on('open', () => {
             // receive messages
-            streamControllerConnection.on('data', handleStreamControllerEvents)
+            streamControllerConnection.on('data', (event) => handleStreamControllerEvents(event, mediaConnection?.connectionId))
     
             // send messages
             console.log('sendind UPDATE-USER-INFO data', { event: 'updated-user-info', data: {...user.value} })
