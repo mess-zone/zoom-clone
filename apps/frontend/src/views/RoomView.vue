@@ -167,9 +167,7 @@ if(peer.value) {
         _addDataConnection(dataConnection)
         dataConnection.on('open', () => {
             // receive messages
-            dataConnection.on('data', (e) => {
-                console.log('MANO TEM CERTEZA QUE NÃO RECEBE ENVENTOS?', e)
-            })
+            dataConnection.on('data', handleStreamControllerEvents)
         })
     })
 
@@ -191,6 +189,15 @@ room.socket.on("user-disconnected", (userId) => {
 });
 
 
+function handleStreamControllerEvents(event) {
+    console.log('[stream-controller] received event:', event)
+    switch(event.event) {
+        case 'updated-user-info':
+            console.log('UPDATED USER INFO')
+            break
+    }
+}
+
 /**
  * @deprecated
  * @param destPeerId 
@@ -204,9 +211,7 @@ function connectToNewUser(destUser, localStream) {
     if(streamControllerConnection){
         streamControllerConnection.on('open', () => {
             // receive messages
-            streamControllerConnection.on('data', (e) => {
-                console.log('connectToNewUser MANO TEM CERTEZA QUE NÃO RECEBE ENVENTOS?', e)
-            })
+            streamControllerConnection.on('data', handleStreamControllerEvents)
     
             // send messages
             console.log('sendind UPDATE-USER-INFO data', { event: 'updated-user-info', data: {...user.value} })
