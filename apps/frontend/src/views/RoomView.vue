@@ -103,6 +103,7 @@ import StreamPreview from "../components/molecules/StreamPreview.vue";
 import { usePeer } from "../composables/usePeer";
 import { DataConnection, MediaConnection } from "peerjs";
 import { generateRandomUser } from "../utils/randomUser"
+import { v4 as uuidV4 } from 'uuid'
 
 const route = useRoute();
 
@@ -196,11 +197,11 @@ if(peer.value) {
 
         // add remote stream to array of remote streams
         const remoteStream: RemoteStream = {
-            id: mediaConnection.connectionId,
+            id: mediaConnection.metadata.remoteStreamId,
             peerId: mediaConnection.peer,
             mediaChannel: mediaConnection,
             dataChannel: null,
-            type: 'cam',
+            type: mediaConnection.metadata.remoteStreamType,
         }
         addToRemoteStreams(remoteStream)
     });
@@ -214,11 +215,11 @@ if(peer.value) {
 
         // add remote stream to array of remote streams
         const remoteStream: RemoteStream = {
-            id: dataConnection.metadata.mediaConnectionId,
+            id: dataConnection.metadata.remoteStreamId,
             peerId: dataConnection.peer,
             mediaChannel: null,
             dataChannel: dataConnection,
-            type: 'cam',
+            type: dataConnection.metadata.remoteStreamType,
         }
         addToRemoteStreams(remoteStream)
     })
@@ -260,11 +261,18 @@ function handleStreamControllerEvents(event, mediaStreamConnectionId) {
  */
 function connectToNewUser(destUser, localStream) {
 
+    const remoteStreamId = uuidV4()
+
+    const metadata = {
+        remoteStreamId,
+        remoteStreamType: 'cam',
+    }
+
     // call destination peer
-    const mediaConnection = call(destUser.peerId, localStream, { remoteStreamType: 'cam' });
+    const mediaConnection = call(destUser.peerId, localStream, metadata);
 
     // data controller connection
-    const streamControllerConnection = connect(destUser.peerId, { metadata: { remoteStreamType: 'cam', mediaConnectionId: mediaConnection?.connectionId } })
+    const streamControllerConnection = connect(destUser.peerId, { metadata })
     if(streamControllerConnection && mediaConnection){
         streamControllerConnection.on('open', () => {
             // receive messages
@@ -279,7 +287,7 @@ function connectToNewUser(destUser, localStream) {
 
         // add remote stream to array of remote streams
         const remoteStream: RemoteStream = {
-            id: mediaConnection.connectionId,
+            id: remoteStreamId,
             peerId: destUser.peerId,
             mediaChannel: mediaConnection,
             dataChannel: streamControllerConnection,
