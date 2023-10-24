@@ -199,6 +199,12 @@ function sendDataToRemoteStream(remoteStreamId: string, payload) {
     }
 }
 
+function sendToAllRemoteStreams(payload) {
+    for(const remoteStream of remoteStreams.value) {
+        console.log('BROADCAST DATA TO ALL', remoteStream, payload)
+    }
+}
+
 if(peer.value) {
     // when my peer object is created, join the socket room
     peer.value.on("open", (id) => {
@@ -385,8 +391,8 @@ function handleRaiseHand() {
     handIsRaised.value = !handIsRaised.value
 
     // send messages
-    console.log('sending HAND UP data', { event: 'hand-up', data: {} })
-    // dataConnection.send({ event: 'updated-user-info', data: {...user.value} })
+    const payload = { event: 'hand-up', data: {} }
+    sendToAllRemoteStreams(payload)
 }
 </script>
 
