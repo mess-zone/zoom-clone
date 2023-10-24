@@ -143,7 +143,7 @@ const {
 const sharedScreenVideo = ref<HTMLVideoElement>();
 
 
-const { stream: shareScreenStream, stop, enabled: screenIsSharing } = useDisplayMedia()
+const { stream: shareScreenStream, stop, enabled: screenIsSharing } = useDisplayMedia({ video: true, audio: true })
 
 watchEffect(() => {
   // preview on a video element
