@@ -480,10 +480,10 @@ function disconnectSharedScreenWithAllUsers() {
     for(const remoteStream of remoteStreams.value) {
         if(remoteStream.type == 'screen-share') {
             console.log('PARA REMOVER?', remoteStream)
-            // removeFromRemoteStreams(remoteStream as RemoteStream)
+            removeFromRemoteStreams(remoteStream as RemoteStream)
         }
     }
-    // TODO remove all peer connections related to all removed remote streams
+    // TODO remover all peer connections related to all removed remote streams
 
 }
 
