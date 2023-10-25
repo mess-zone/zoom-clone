@@ -694,7 +694,7 @@ function handleShareScreen() {
 
 
 #streamGrid {
-  background-color: pink;
+  /* background-color: pink; */
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -717,7 +717,7 @@ function handleShareScreen() {
 }
 
 .local-stream-grid {
-    background-color: aqua;
+    /* background-color: aqua; */
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -725,7 +725,7 @@ function handleShareScreen() {
     justify-content: center;
     align-items: center;
     gap: 15px;
-    padding: 15px;
+    padding: 15px 30px;
 }
 
 
