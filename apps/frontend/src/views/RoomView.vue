@@ -230,12 +230,13 @@ function sendDataToRemoteStream(remoteStreamId: string, payload) {
     }
 }
 
-// TODO esse metodo deveria enviar dependendo do tipo: call ou screen-share. Se não pode dar muito errado ao já ter uma pessoa compartilhando a tela
-function sendToAllRemoteStreams(payload) {
-    console.log('BROADCAST DATA TO ALL', payload)
+function sendToAllRemoteStreams(payload, streamType: string) {
+    console.log(`BROADCAST DATA TO ALL ${streamType} streams`, payload)
     for(const remoteStream of remoteStreams.value) {
-        if(remoteStream.dataChannel) {
-            remoteStream.dataChannel.send(payload)
+        if(remoteStream.type == streamType) {
+            if(remoteStream.dataChannel) {
+                remoteStream.dataChannel.send(payload)
+            }
         }
     }
 }
@@ -484,7 +485,7 @@ function handleRaiseHand() {
 
     // send messages
     const payload = { event: (handIsRaised.value ? 'hand-up' : 'hand-down'), data: {} }
-    sendToAllRemoteStreams(payload)
+    sendToAllRemoteStreams(payload, 'cam')
 }
 
 function handleShareScreen() {
