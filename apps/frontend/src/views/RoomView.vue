@@ -162,6 +162,8 @@ watchEffect(() => {
     shareScreenStream.value.addEventListener('inactive', (e) => {
         console.log('shared screen inactive', e)
         stop()
+        console.log('ENVIAR COMANDO DE ENCERRAR COMPARTILHAMENTO DE TELA')
+        disconnectSharedScreenWithAllUsers()
     })
   }
 
@@ -319,7 +321,6 @@ room.socket.on("user-connected", (user) => {
     addToast({ message: `${user.name} entrou na reunião`})
     connectToNewUser(user.peerId, camStream.value);
     if(screenIsSharing.value) {
-        console.log('TENHO QUE COMPARTILHAR MINHA TELA COM ELE', user.peerId, shareScreenStream.value)
         connectToShareScreenWithUser(user.peerId, shareScreenStream.value)
     }
 });
@@ -359,6 +360,14 @@ function handDown(data, remoteStreamId) {
     }
 }
 
+function sharedScreenStopped(data, remoteStreamId) {
+    const remoteStream = remoteStreams.value.find(remoteStream => remoteStream.id == remoteStreamId)
+    if(remoteStream) {
+        console.log('SHARED SCREEN STOPPED, removing remote stream', remoteStreamId, remoteStream, data)
+        removeFromRemoteStreams(remoteStream as RemoteStream)
+    }
+}
+
 
 function handleStreamControllerEvents(event, remoteStreamId) {
     console.log(`[stream-controller] media stream ${remoteStreamId} received event:`, event)
@@ -371,6 +380,9 @@ function handleStreamControllerEvents(event, remoteStreamId) {
             break
         case 'hand-down':
             handDown(event.data, remoteStreamId)
+            break
+        case 'shared-screen-stopped':
+            sharedScreenStopped(event.data, remoteStreamId)
             break
     }
 }
@@ -459,6 +471,22 @@ function connectToShareScreenWithUser(destUserPeerId, localSharedScreemStream) {
     }
 }
 
+function disconnectSharedScreenWithAllUsers() {
+    
+    const payload = { event: 'shared-screen-stopped', data: { } }
+    sendToAllRemoteStreams(payload, 'screen-share') // TODO deveria esperar todas as conexões receberem o payload antes de serem removidas do array de remoteStreams?
+
+    // remove all remote streams of type screen-share invisible
+    for(const remoteStream of remoteStreams.value) {
+        if(remoteStream.type == 'screen-share') {
+            console.log('PARA REMOVER?', remoteStream)
+            // removeFromRemoteStreams(remoteStream as RemoteStream)
+        }
+    }
+    // TODO remove all peer connections related to all removed remote streams
+
+}
+
 
 
 const settingsModalIsOpen = ref(false)
@@ -471,6 +499,7 @@ function closeSettingsModal() {
     settingsModalIsOpen.value = false
 }
 
+// TODO ao desligar a chamada é preciso garantir que todas as conexões são fechadas, inclusive a de compartilhamento de tela, se houver
 function handleLeaveRoom() {
     removeAllRemoteStreamsByUser(userId.value)
     _closeAllConnectionsFromUser(userId.value)
@@ -495,6 +524,7 @@ function handleRaiseHand() {
 function handleShareScreen() {
     screenIsSharing.value = !screenIsSharing.value
 
+    // ativar compartilhamento
     if(screenIsSharing.value) {
         // FIX deve dar um jeito de esperar o usuario iniciar o compartilhamento no navegador antes de connectar com os outros usuarios, senão a mediaconnection estará vazia
         setTimeout(() => {
@@ -506,6 +536,8 @@ function handleShareScreen() {
                 }
             }
         }, 10000)
+    } else { // desativar compartilhamento
+            // console.log('DESATIVAR COMPARTILHAMENTO DE TELA')
     }
 }
 </script>
