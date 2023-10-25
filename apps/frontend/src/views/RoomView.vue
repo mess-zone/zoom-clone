@@ -318,6 +318,10 @@ room.socket.on("user-connected", (user) => {
     clients.value.set(user.peerId, user)
     addToast({ message: `${user.name} entrou na reunião`})
     connectToNewUser(user.peerId, camStream.value);
+    if(screenIsSharing.value) {
+        console.log('TENHO QUE COMPARTILHAR MINHA TELA COM ELE', user.peerId, shareScreenStream.value)
+        connectToShareScreenWithUser(user.peerId, shareScreenStream.value)
+    }
 });
 
 room.socket.on("user-disconnected", (userId) => {
