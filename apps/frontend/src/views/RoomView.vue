@@ -154,6 +154,7 @@ const { stream: shareScreenStream, stop, enabled: screenIsSharing } = useDisplay
         autoGainControl: false,
         channelCount: 2,
         echoCancellation: false,
+        // @ts-ignore latency does not exists?
         latency: 0,
         noiseSuppression: false,
         sampleRate: 48000,
