@@ -1,5 +1,5 @@
 <template>
-    <div class="stream-preview">
+    <div class="stream-preview" :class="remoteStream.type">
         <video ref="video" autoplay controls ></video>
         <div class="bottom-bar">
             [{{ `${remoteStream.type}` }}] {{ remoteStream.user?.name }} {{ remoteStream.user?.color }}
@@ -48,7 +48,14 @@ watchEffect(() => {
     width: 100%;
     height: 100%;
     inset: 0;
+}
+
+.stream-preview.cam video {
     object-fit: cover;
+}
+
+.stream-preview.screen-share video {
+    object-fit: contain;
 }
 
 .bottom-bar {
