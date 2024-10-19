@@ -146,7 +146,21 @@ const {
 const sharedScreenVideo = ref<HTMLVideoElement>();
 
 
-const { stream: shareScreenStream, stop, enabled: screenIsSharing } = useDisplayMedia({ video: true, audio: true })
+// const { stream: shareScreenStream, stop, enabled: screenIsSharing } = useDisplayMedia({ video: true, audio: true })
+const { stream: shareScreenStream, stop, enabled: screenIsSharing } = useDisplayMedia({ 
+    video: true, 
+    // high quality audio https://stackoverflow.com/questions/46063374/is-it-really-possible-for-webrtc-to-stream-high-quality-audio-without-noise
+    audio: {
+        autoGainControl: false,
+        channelCount: 2,
+        echoCancellation: false,
+        latency: 0,
+        noiseSuppression: false,
+        sampleRate: 48000,
+        sampleSize: 16,
+        volume: 1.0
+    } 
+})
 
 watchEffect(() => {
   // preview on a video element

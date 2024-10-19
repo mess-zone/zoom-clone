@@ -7,7 +7,7 @@ const currentMicrophone = ref<string>();
 const { videoInputs: cameras, audioInputs: microphones } = useDevicesList({
     requestPermissions: true,
     onUpdated() {
-        console.log("use devices list on updated");
+        console.log("use devices list on updated", cameras.value, microphones.value);
         if (!cameras.value.find((i) => i.deviceId === currentCamera.value)) {
             currentCamera.value = cameras.value[0]?.deviceId;
         }
