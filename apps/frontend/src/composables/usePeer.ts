@@ -43,24 +43,9 @@ export function usePeer() {
     /**
      * Abrir media connection
     */
-    function call(destPeerId: string, localStream: MediaStream, metadata?: any) {
-        console.log(`[peer] calling the remote peer ${destPeerId}`, metadata);
-        const options = {
-            metadata,
-            'constraints': {
-                'mandatory': {
-                    'OfferToReceiveAudio': true,
-                    'OfferToReceiveVideo': true
-                },
-                offerToReceiveAudio: 1,
-                offerToReceiveVideo: 1,
-             },
-             // https://stackoverflow.com/questions/74926110/peerjs-how-to-use-sdp-to-improve-audio-quality
-             'sdpTransform': (sdpString) => {
-                 return sdpString.replace("a=fmtp:111 minptime=10;useinbandfec=1","a=fmtp:111 ptime=5;useinbandfec=1;stereo=1;maxplaybackrate=48000;maxaveragebitrat=128000;sprop-stereo=1");
-             }
-        }
-
+    function call(destPeerId: string, localStream: MediaStream, options?: any) {
+        console.log(`[peer] calling the remote peer ${destPeerId}`, options);
+  
         const mediaConnection = peer.value?.call(destPeerId, localStream, options)
         _addMediaConnection(mediaConnection)
 

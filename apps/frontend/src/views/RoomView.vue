@@ -397,8 +397,12 @@ function connectToNewUser(destUserPeerId, localCamStream) {
         remoteStreamType: 'cam',
     }
 
+    const options = {
+        metadata
+    }
+
     // call destination peer
-    const mediaConnection = call(destUserPeerId, localCamStream, metadata);
+    const mediaConnection = call(destUserPeerId, localCamStream, options);
     console.log('EU TO LIGANDO PRA COMPARTILHAR A CAMERA?', mediaConnection)
 
 
@@ -439,8 +443,24 @@ function connectToShareScreenWithUser(destUserPeerId, localSharedScreemStream) {
         remoteStreamType: 'screen-share',
     }
 
+    const options = {
+            metadata,
+            'constraints': {
+                'mandatory': {
+                    'OfferToReceiveAudio': true,
+                    'OfferToReceiveVideo': true
+                },
+                offerToReceiveAudio: 1,
+                offerToReceiveVideo: 1,
+             },
+             // better audio quality https://stackoverflow.com/questions/74926110/peerjs-how-to-use-sdp-to-improve-audio-quality
+             'sdpTransform': (sdpString) => {
+                 return sdpString.replace("a=fmtp:111 minptime=10;useinbandfec=1","a=fmtp:111 ptime=5;useinbandfec=1;stereo=1;maxplaybackrate=48000;maxaveragebitrat=128000;sprop-stereo=1");
+             }
+        }
+
     // call destination peer
-    const mediaConnection = call(destUserPeerId, localSharedScreemStream, metadata);
+    const mediaConnection = call(destUserPeerId, localSharedScreemStream, options);
     console.log('EU TO LIGANDO PRA COMPARTILHAR A TELA?', mediaConnection?.remoteStream)
 
     // data controller connection
