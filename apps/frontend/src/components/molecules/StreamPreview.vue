@@ -1,6 +1,6 @@
 <template>
     <div class="stream-preview">
-        <video ref="video" autoplay></video>
+        <video ref="video" autoplay controls ></video>
         <div class="bottom-bar">
             [{{ `${remoteStream.type}` }}] {{ remoteStream.user?.name }} {{ remoteStream.user?.color }}
             <font-awesome-icon icon="fa-regular fa-hand" v-if="!!remoteStream.raisedHand"/>
